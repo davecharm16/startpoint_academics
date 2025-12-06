@@ -1,0 +1,60 @@
+name: implementation-sprint
+description: "Orchestrates complete Phase 4 implementation cycle: epic contexting, story drafting, marking ready, and development. Guides through the recommended sprint workflow for efficient story-by-story delivery."
+author: "BMad"
+
+# Critical variables from config
+config_source: "{project-root}/.bmad/bmm/config.yaml"
+output_folder: "{config_source}:output_folder"
+user_name: "{config_source}:user_name"
+communication_language: "{config_source}:communication_language"
+user_skill_level: "{config_source}:user_skill_level"
+date: system-generated
+sprint_artifacts: "{config_source}:sprint_artifacts"
+
+# Status tracking
+sprint_status: "{sprint_artifacts}/sprint-status.yaml || {output_folder}/sprint-status.yaml"
+
+# Workflow components
+installed_path: "{project-root}/.bmad/bmm/workflows/4-implementation/implementation-sprint"
+instructions: "{installed_path}/instructions.md"
+validation: "{installed_path}/checklist.md"
+
+# Variables and inputs
+variables:
+  # Project identification
+  project_name: "{config_source}:project_name"
+
+  # Story and epic tracking
+  story_dir: "{config_source}:sprint_artifacts"
+  epics_location: "{output_folder}"
+
+  # Sub-workflow paths
+  epic_tech_context_workflow: "{project-root}/.bmad/bmm/workflows/4-implementation/epic-tech-context"
+  create_story_workflow: "{project-root}/.bmad/bmm/workflows/4-implementation/create-story"
+  story_ready_workflow: "{project-root}/.bmad/bmm/workflows/4-implementation/story-ready"
+  dev_story_workflow: "{project-root}/.bmad/bmm/workflows/4-implementation/dev-story"
+  code_review_workflow: "{project-root}/.bmad/bmm/workflows/4-implementation/code-review"
+  story_done_workflow: "{project-root}/.bmad/bmm/workflows/4-implementation/story-done"
+  retrospective_workflow: "{project-root}/.bmad/bmm/workflows/4-implementation/retrospective"
+
+# Smart input file references
+input_file_patterns:
+  sprint_status:
+    description: "Current sprint status tracking"
+    whole: "{sprint_artifacts}/sprint-status.yaml"
+    load_strategy: "FULL_LOAD"
+  epics:
+    description: "All epics with user stories"
+    whole: "{output_folder}/*epic*.md"
+    sharded: "{output_folder}/*epic*/*.md"
+    load_strategy: "SELECTIVE_LOAD"
+  architecture:
+    description: "System architecture and decisions"
+    whole: "{output_folder}/*architecture*.md"
+    load_strategy: "FULL_LOAD"
+  prd:
+    description: "Product requirements"
+    whole: "{output_folder}/*prd*.md"
+    load_strategy: "FULL_LOAD"
+
+standalone: true

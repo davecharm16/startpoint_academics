@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startpoint Academics - Color Theme Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.8;
+        }
+
+        .theme-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .theme-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .theme-btn:hover {
+            border-color: #3b82f6;
+            background: #f0f9ff;
+        }
+
+        .theme-btn.active {
+            border-color: #3b82f6;
+            background: #3b82f6;
+            color: white;
+        }
+
+        .theme-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .theme-section {
+            display: none;
+        }
+
+        .theme-section.active {
+            display: block;
+        }
+
+        .theme-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            border-radius: 12px;
+            color: white;
+        }
+
+        .theme-header h2 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .theme-header .personality {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .theme-header .best-for {
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .color-swatch {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .color-swatch .color {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .color-swatch .info {
+            padding: 0.75rem;
+            background: white;
+            font-size: 0.8rem;
+        }
+
+        .color-swatch .info .name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .color-swatch .info .hex {
+            color: #64748b;
+            font-family: monospace;
+        }
+
+        .components-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .components-section h3 {
+            margin-bottom: 1.5rem;
+            color: #334155;
+        }
+
+        .component-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid;
+        }
+
+        .input-demo {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 250px;
+        }
+
+        .input-demo:focus {
+            outline: none;
+        }
+
+        .card-demo {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            max-width: 350px;
+        }
+
+        .card-demo h4 {
+            margin-bottom: 0.5rem;
+        }
+
+        .card-demo p {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            width: 200px;
+        }
+
+        .progress-bar .fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .alert-demo {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .mockup-section {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .mockup-section h3 {
+            margin-bottom: 1.5rem;
+            color: #334155;
+        }
+
+        .mini-dashboard {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .mini-nav {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .mini-nav .logo {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .mini-content {
+            padding: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .stat-card .label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* Theme 1: Academic Trust */
+        .theme-1 .theme-header { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); }
+        .theme-1 .btn-primary { background: #1e3a5f; color: white; }
+        .theme-1 .btn-primary:hover { background: #2d5a87; }
+        .theme-1 .btn-outline { border-color: #1e3a5f; color: #1e3a5f; }
+        .theme-1 .accent { background: #d4a853; color: #1e3a5f; }
+        .theme-1 .input-demo:focus { border-color: #1e3a5f; box-shadow: 0 0 0 3px rgba(30,58,95,0.1); }
+        .theme-1 .status-in-progress { background: #dbeafe; color: #1e3a5f; }
+        .theme-1 .progress-bar .fill { background: linear-gradient(90deg, #1e3a5f, #d4a853); }
+        .theme-1 .alert-success { background: #dcfce7; color: #166534; }
+        .theme-1 .alert-warning { background: #fef3c7; color: #92400e; }
+        .theme-1 .alert-error { background: #fee2e2; color: #991b1b; }
+        .theme-1 .mini-nav { background: #1e3a5f; color: white; }
+        .theme-1 .stat-card { background: #f0f4f8; color: #1e3a5f; }
+
+        /* Theme 2: Modern Professional */
+        .theme-2 .theme-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        .theme-2 .btn-primary { background: #0d9488; color: white; }
+        .theme-2 .btn-primary:hover { background: #0f766e; }
+        .theme-2 .btn-outline { border-color: #0d9488; color: #0d9488; }
+        .theme-2 .accent { background: #0d9488; color: white; }
+        .theme-2 .input-demo:focus { border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13,148,136,0.1); }
+        .theme-2 .status-in-progress { background: #ccfbf1; color: #0d9488; }
+        .theme-2 .progress-bar .fill { background: linear-gradient(90deg, #0d9488, #2dd4bf); }
+        .theme-2 .alert-success { background: #dcfce7; color: #166534; }
+        .theme-2 .alert-warning { background: #fef3c7; color: #92400e; }
+        .theme-2 .alert-error { background: #fee2e2; color: #991b1b; }
+        .theme-2 .mini-nav { background: #0f172a; color: white; }
+        .theme-2 .stat-card { background: #f0fdfa; color: #0d9488; }
+
+        /* Theme 3: Warm Confidence */
+        .theme-3 .theme-header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+        .theme-3 .btn-primary { background: #4f46e5; color: white; }
+        .theme-3 .btn-primary:hover { background: #4338ca; }
+        .theme-3 .btn-outline { border-color: #4f46e5; color: #4f46e5; }
+        .theme-3 .accent { background: #f59e0b; color: white; }
+        .theme-3 .input-demo:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .theme-3 .status-in-progress { background: #e0e7ff; color: #4f46e5; }
+        .theme-3 .progress-bar .fill { background: linear-gradient(90deg, #4f46e5, #f59e0b); }
+        .theme-3 .alert-success { background: #dcfce7; color: #166534; }
+        .theme-3 .alert-warning { background: #fef3c7; color: #92400e; }
+        .theme-3 .alert-error { background: #fee2e2; color: #991b1b; }
+        .theme-3 .mini-nav { background: #4f46e5; color: white; }
+        .theme-3 .stat-card { background: #eef2ff; color: #4f46e5; }
+
+        /* Theme 4: Clean & Calm */
+        .theme-4 .theme-header { background: linear-gradient(135deg, #475569 0%, #64748b 100%); }
+        .theme-4 .btn-primary { background: #10b981; color: white; }
+        .theme-4 .btn-primary:hover { background: #059669; }
+        .theme-4 .btn-outline { border-color: #10b981; color: #10b981; }
+        .theme-4 .accent { background: #10b981; color: white; }
+        .theme-4 .input-demo:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,0.1); }
+        .theme-4 .status-in-progress { background: #d1fae5; color: #059669; }
+        .theme-4 .progress-bar .fill { background: linear-gradient(90deg, #10b981, #34d399); }
+        .theme-4 .alert-success { background: #dcfce7; color: #166534; }
+        .theme-4 .alert-warning { background: #fef3c7; color: #92400e; }
+        .theme-4 .alert-error { background: #fee2e2; color: #991b1b; }
+        .theme-4 .mini-nav { background: #475569; color: white; }
+        .theme-4 .stat-card { background: #f0fdf4; color: #059669; }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .component-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎨 Startpoint Academics - Color Theme Explorer</h1>
+        <p>Compare 4 design directions with live UI components</p>
+    </div>
+
+    <nav class="theme-nav">
+        <button class="theme-btn active" onclick="showTheme(1)">1. Academic Trust</button>
+        <button class="theme-btn" onclick="showTheme(2)">2. Modern Professional</button>
+        <button class="theme-btn" onclick="showTheme(3)">3. Warm Confidence</button>
+        <button class="theme-btn" onclick="showTheme(4)">4. Clean & Calm</button>
+    </nav>
+
+    <div class="theme-container">
+        <!-- Theme 1: Academic Trust -->
+        <div class="theme-section theme-1 active" id="theme-1">
+            <div class="theme-header">
+                <h2>🎓 Academic Trust</h2>
+                <p class="personality">Deep blue + Gold accents — Prestigious, reliable, university-inspired</p>
+                <span class="best-for">Best for: Conveying expertise and academic credibility</span>
+            </div>
+
+            <h3 style="margin-bottom: 1rem;">Color Palette</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color" style="background: #1e3a5f; color: white;">Primary</div>
+                    <div class="info"><div class="name">Deep Navy</div><div class="hex">#1e3a5f</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #2d5a87; color: white;">Primary Light</div>
+                    <div class="info"><div class="name">Royal Blue</div><div class="hex">#2d5a87</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #d4a853; color: #1e3a5f;">Accent</div>
+                    <div class="info"><div class="name">Academic Gold</div><div class="hex">#d4a853</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #16a34a; color: white;">Success</div>
+                    <div class="info"><div class="name">Success Green</div><div class="hex">#16a34a</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #dc2626; color: white;">Error</div>
+                    <div class="info"><div class="name">Error Red</div><div class="hex">#dc2626</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #f8fafc; color: #1e293b;">Background</div>
+                    <div class="info"><div class="name">Light Gray</div><div class="hex">#f8fafc</div></div>
+                </div>
+            </div>
+
+            <div class="components-section">
+                <h3>UI Components</h3>
+                <div class="component-row">
+                    <button class="btn btn-primary">Submit Project</button>
+                    <button class="btn btn-secondary">Cancel</button>
+                    <button class="btn btn-outline">View Details</button>
+                    <span class="status-badge accent">Premium Package</span>
+                </div>
+                <div class="component-row">
+                    <input type="text" class="input-demo" placeholder="Enter project topic...">
+                    <span class="status-badge status-in-progress">● In Progress</span>
+                </div>
+                <div class="component-row">
+                    <span style="margin-right: 0.5rem;">Progress:</span>
+                    <div class="progress-bar"><div class="fill" style="width: 65%;"></div></div>
+                    <span style="margin-left: 0.5rem; font-weight: 600;">65%</span>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <div class="alert-demo alert-success">✓ Your project has been submitted successfully!</div>
+                    <div class="alert-demo alert-warning">⚠ Deadline approaching in 24 hours</div>
+                    <div class="alert-demo alert-error">✕ Please fill in all required fields</div>
+                </div>
+            </div>
+
+            <div class="mockup-section">
+                <h3>Mini Dashboard Preview</h3>
+                <div class="mini-dashboard">
+                    <div class="mini-nav">
+                        <span class="logo">📚 Startpoint Academics</span>
+                    </div>
+                    <div class="mini-content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="number">12</div>
+                                <div class="label">Active Projects</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="number">$2,450</div>
+                                <div class="label">This Month</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="number">98%</div>
+                                <div class="label">On-Time Rate</div>
+                            </div>
+                        </div>
+                        <div class="card-demo">
+                            <h4 style="color: #1e3a5f;">Research Paper - Economics</h4>
+                            <p>Client: John D. • Due: Dec 5, 2025</p>
+                            <span class="status-badge status-in-progress">● In Progress</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Theme 2: Modern Professional -->
+        <div class="theme-section theme-2" id="theme-2">
+            <div class="theme-header">
+                <h2>💼 Modern Professional</h2>
+                <p class="personality">Slate/Navy + Teal accents — Contemporary, reliable, tech-forward</p>
+                <span class="best-for">Best for: Balancing trust with modern appeal</span>
+            </div>
+
+            <h3 style="margin-bottom: 1rem;">Color Palette</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color" style="background: #0f172a; color: white;">Primary Dark</div>
+                    <div class="info"><div class="name">Slate 900</div><div class="hex">#0f172a</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #1e293b; color: white;">Primary</div>
+                    <div class="info"><div class="name">Slate 800</div><div class="hex">#1e293b</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #0d9488; color: white;">Accent</div>
+                    <div class="info"><div class="name">Teal 600</div><div class="hex">#0d9488</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #16a34a; color: white;">Success</div>
+                    <div class="info"><div class="name">Success Green</div><div class="hex">#16a34a</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #dc2626; color: white;">Error</div>
+                    <div class="info"><div class="name">Error Red</div><div class="hex">#dc2626</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #f8fafc; color: #1e293b;">Background</div>
+                    <div class="info"><div class="name">Light Gray</div><div class="hex">#f8fafc</div></div>
+                </div>
+            </div>
+
+            <div class="components-section">
+                <h3>UI Components</h3>
+                <div class="component-row">
+                    <button class="btn btn-primary">Submit Project</button>
+                    <button class="btn btn-secondary">Cancel</button>
+                    <button class="btn btn-outline">View Details</button>
+                    <span class="status-badge accent">Premium Package</span>
+                </div>
+                <div class="component-row">
+                    <input type="text" class="input-demo" placeholder="Enter project topic...">
+                    <span class="status-badge status-in-progress">● In Progress</span>
+                </div>
+                <div class="component-row">
+                    <span style="margin-right: 0.5rem;">Progress:</span>
+                    <div class="progress-bar"><div class="fill" style="width: 65%;"></div></div>
+                    <span style="margin-left: 0.5rem; font-weight: 600;">65%</span>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <div class="alert-demo alert-success">✓ Your project has been submitted successfully!</div>
+                    <div class="alert-demo alert-warning">⚠ Deadline approaching in 24 hours</div>
+                    <div class="alert-demo alert-error">✕ Please fill in all required fields</div>
+                </div>
+            </div>
+
+            <div class="mockup-section">
+                <h3>Mini Dashboard Preview</h3>
+                <div class="mini-dashboard">
+                    <div class="mini-nav">
+                        <span class="logo">📚 Startpoint Academics</span>
+                    </div>
+                    <div class="mini-content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="number">12</div>
+                                <div class="label">Active Projects</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="number">$2,450</div>
+                                <div class="label">This Month</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="number">98%</div>
+                                <div class="label">On-Time Rate</div>
+                            </div>
+                        </div>
+                        <div class="card-demo">
+                            <h4 style="color: #0d9488;">Research Paper - Economics</h4>
+                            <p>Client: John D. • Due: Dec 5, 2025</p>
+                            <span class="status-badge status-in-progress">● In Progress</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Theme 3: Warm Confidence -->
+        <div class="theme-section theme-3" id="theme-3">
+            <div class="theme-header">
+                <h2>💜 Warm Confidence</h2>
+                <p class="personality">Indigo/Purple + Amber accents — Smart, approachable, premium feel</p>
+                <span class="best-for">Best for: Standing out while feeling trustworthy</span>
+            </div>
+
+            <h3 style="margin-bottom: 1rem;">Color Palette</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color" style="background: #4f46e5; color: white;">Primary</div>
+                    <div class="info"><div class="name">Indigo 600</div><div class="hex">#4f46e5</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #7c3aed; color: white;">Primary Alt</div>
+                    <div class="info"><div class="name">Violet 600</div><div class="hex">#7c3aed</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #f59e0b; color: white;">Accent</div>
+                    <div class="info"><div class="name">Amber 500</div><div class="hex">#f59e0b</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #16a34a; color: white;">Success</div>
+                    <div class="info"><div class="name">Success Green</div><div class="hex">#16a34a</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #dc2626; color: white;">Error</div>
+                    <div class="info"><div class="name">Error Red</div><div class="hex">#dc2626</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #f8fafc; color: #1e293b;">Background</div>
+                    <div class="info"><div class="name">Light Gray</div><div class="hex">#f8fafc</div></div>
+                </div>
+            </div>
+
+            <div class="components-section">
+                <h3>UI Components</h3>
+                <div class="component-row">
+                    <button class="btn btn-primary">Submit Project</button>
+                    <button class="btn btn-secondary">Cancel</button>
+                    <button class="btn btn-outline">View Details</button>
+                    <span class="status-badge accent">Premium Package</span>
+                </div>
+                <div class="component-row">
+                    <input type="text" class="input-demo" placeholder="Enter project topic...">
+                    <span class="status-badge status-in-progress">● In Progress</span>
+                </div>
+                <div class="component-row">
+                    <span style="margin-right: 0.5rem;">Progress:</span>
+                    <div class="progress-bar"><div class="fill" style="width: 65%;"></div></div>
+                    <span style="margin-left: 0.5rem; font-weight: 600;">65%</span>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <div class="alert-demo alert-success">✓ Your project has been submitted successfully!</div>
+                    <div class="alert-demo alert-warning">⚠ Deadline approaching in 24 hours</div>
+                    <div class="alert-demo alert-error">✕ Please fill in all required fields</div>
+                </div>
+            </div>
+
+            <div class="mockup-section">
+                <h3>Mini Dashboard Preview</h3>
+                <div class="mini-dashboard">
+                    <div class="mini-nav">
+                        <span class="logo">📚 Startpoint Academics</span>
+                    </div>
+                    <div class="mini-content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="number">12</div>
+                                <div class="label">Active Projects</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="number">$2,450</div>
+                                <div class="label">This Month</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="number">98%</div>
+                                <div class="label">On-Time Rate</div>
+                            </div>
+                        </div>
+                        <div class="card-demo">
+                            <h4 style="color: #4f46e5;">Research Paper - Economics</h4>
+                            <p>Client: John D. • Due: Dec 5, 2025</p>
+                            <span class="status-badge status-in-progress">● In Progress</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Theme 4: Clean & Calm -->
+        <div class="theme-section theme-4" id="theme-4">
+            <div class="theme-header">
+                <h2>🌿 Clean & Calm</h2>
+                <p class="personality">Soft slate + Green accents — Minimal, reassuring, effortless</p>
+                <span class="best-for">Best for: Reducing anxiety, creating calm focus</span>
+            </div>
+
+            <h3 style="margin-bottom: 1rem;">Color Palette</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color" style="background: #475569; color: white;">Primary</div>
+                    <div class="info"><div class="name">Slate 600</div><div class="hex">#475569</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #64748b; color: white;">Primary Light</div>
+                    <div class="info"><div class="name">Slate 500</div><div class="hex">#64748b</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #10b981; color: white;">Accent</div>
+                    <div class="info"><div class="name">Emerald 500</div><div class="hex">#10b981</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #16a34a; color: white;">Success</div>
+                    <div class="info"><div class="name">Success Green</div><div class="hex">#16a34a</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #dc2626; color: white;">Error</div>
+                    <div class="info"><div class="name">Error Red</div><div class="hex">#dc2626</div></div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color" style="background: #f8fafc; color: #1e293b;">Background</div>
+                    <div class="info"><div class="name">Light Gray</div><div class="hex">#f8fafc</div></div>
+                </div>
+            </div>
+
+            <div class="components-section">
+                <h3>UI Components</h3>
+                <div class="component-row">
+                    <button class="btn btn-primary">Submit Project</button>
+                    <button class="btn btn-secondary">Cancel</button>
+                    <button class="btn btn-outline">View Details</button>
+                    <span class="status-badge accent">Premium Package</span>
+                </div>
+                <div class="component-row">
+                    <input type="text" class="input-demo" placeholder="Enter project topic...">
+                    <span class="status-badge status-in-progress">● In Progress</span>
+                </div>
+                <div class="component-row">
+                    <span style="margin-right: 0.5rem;">Progress:</span>
+                    <div class="progress-bar"><div class="fill" style="width: 65%;"></div></div>
+                    <span style="margin-left: 0.5rem; font-weight: 600;">65%</span>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <div class="alert-demo alert-success">✓ Your project has been submitted successfully!</div>
+                    <div class="alert-demo alert-warning">⚠ Deadline approaching in 24 hours</div>
+                    <div class="alert-demo alert-error">✕ Please fill in all required fields</div>
+                </div>
+            </div>
+
+            <div class="mockup-section">
+                <h3>Mini Dashboard Preview</h3>
+                <div class="mini-dashboard">
+                    <div class="mini-nav">
+                        <span class="logo">📚 Startpoint Academics</span>
+                    </div>
+                    <div class="mini-content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="number">12</div>
+                                <div class="label">Active Projects</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="number">$2,450</div>
+                                <div class="label">This Month</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="number">98%</div>
+                                <div class="label">On-Time Rate</div>
+                            </div>
+                        </div>
+                        <div class="card-demo">
+                            <h4 style="color: #10b981;">Research Paper - Economics</h4>
+                            <p>Client: John D. • Due: Dec 5, 2025</p>
+                            <span class="status-badge status-in-progress">● In Progress</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTheme(num) {
+            // Hide all themes
+            document.querySelectorAll('.theme-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.theme-btn').forEach(el => el.classList.remove('active'));
+
+            // Show selected theme
+            document.getElementById('theme-' + num).classList.add('active');
+            document.querySelectorAll('.theme-btn')[num - 1].classList.add('active');
+        }
+    </script>
+</body>
+</html>

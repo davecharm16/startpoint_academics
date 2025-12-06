@@ -2,26 +2,91 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Academic Trust Theme - Light Mode */
+    --background: 210 40% 98%; /* #f8fafc - Light Gray */
+    --foreground: 215 25% 17%; /* #1e293b - Slate 800 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 17%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 17%;
+
+    /* Primary: Deep Navy #1e3a5f */
+    --primary: 213 53% 24%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary: Slate */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 213 53% 24%;
+
+    /* Muted */
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%; /* #64748b */
+
+    /* Accent: Academic Gold #d4a853 */
+    --accent: 40 62% 58%;
+    --accent-foreground: 213 53% 24%;
+
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Border */
+    --border: 214 32% 91%; /* #e2e8f0 */
+    --input: 214 32% 91%;
+    --ring: 213 53% 24%;
+
+    --radius: 0.5rem;
+
+    /* Chart colors */
+    --chart-1: 213 53% 24%;
+    --chart-2: 40 62% 58%;
+    --chart-3: 142 71% 45%;
+    --chart-4: 37 91% 55%;
+    --chart-5: 0 84% 60%;
+  }
+
+  .dark {
+    /* Dark mode - maintain brand colors */
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 40 62% 58%; /* Gold becomes primary in dark */
+    --primary-foreground: 222 47% 11%;
+
+    --secondary: 215 25% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 215 25% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 213 53% 35%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 215 25% 17%;
+    --input: 215 25% 17%;
+    --ring: 40 62% 58%;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }

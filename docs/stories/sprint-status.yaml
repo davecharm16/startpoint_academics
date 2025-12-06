@@ -1,0 +1,113 @@
+# generated: 2025-11-30
+# project: startpoint_academics
+# project_key: startpoint-academics
+# tracking_system: file-system
+# story_location: docs/stories
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic exists in epic file but not contexted
+#   - contexted: Next epic tech context created by *epic-tech-context (required)
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - drafted: Story file created in stories folder by *create-story
+#   - ready-for-dev: Draft approved and story context created by *story-ready
+#   - in-progress: Developer actively working on implementation by *dev-story
+#   - review: Implementation complete, ready for review by *code-review
+#   - done: Story completed by *story-done
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - completed: Retrospective has been done by *retrospective
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epics should be 'contexted' before stories can be 'drafted'
+# - SM typically drafts next story ONLY after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', dev reviews, then Dev moves to 'done'
+
+generated: 2025-11-30
+project: startpoint_academics
+project_key: startpoint-academics
+tracking_system: file-system
+story_location: docs/stories
+
+development_status:
+  # Epic 1: Foundation & Public Pages (21 points, 6 stories)
+  epic-1: contexted
+  1-1-project-infrastructure-setup: done
+  1-2-database-schema-initial-migrations: done
+  1-3-supabase-client-type-generation: done
+  1-4-layout-components-navigation: done
+  1-5-landing-page: done
+  1-6-package-detail-pages: done
+  epic-1-retrospective: optional
+
+  # Epic 2: Client Submission Flow (23 points, 6 stories)
+  epic-2: contexted
+  2-1-intake-form-foundation: done
+  2-2-dynamic-package-fields: done
+  2-3-payment-information-collection: done
+  2-4-form-auto-save: done
+  2-5-project-submission-reference-code: done
+  2-6-submission-validation: done
+  epic-2-retrospective: optional
+
+  # Epic 3: Admin Operations Core (43 points, 11 stories)
+  epic-3: contexted
+  3-1-admin-authentication: done
+  3-2-admin-dashboard-layout: done
+  3-3-admin-dashboard-home: done
+  3-4-projects-list-view: done
+  3-5-project-detail-audit-history: done
+  3-6-writer-assignment: done
+  3-7-package-management: done
+  3-8-payment-validation-workflow: done
+  3-9-payment-settings-configuration: done
+  3-10-payment-methods-management: done
+  3-11-writer-roster-management: done
+  epic-3-retrospective: optional
+
+  # Epic 4: Writer Workspace (20 points, 8 stories)
+  epic-4: contexted
+  4-1-writer-authentication: done
+  4-2-writer-dashboard-layout: done
+  4-3-writer-projects-list: done
+  4-4-project-brief-view: done
+  4-5-status-updates: done
+  4-6-writer-notes: done
+  4-7-estimated-completion-date: done
+  4-8-earnings-breakdown: done
+  epic-4-retrospective: optional
+
+  # Epic 5: Client Tracking & Delivery (17 points, 5 stories)
+  epic-5: contexted
+  5-1-public-tracking-page: done
+  5-2-pin-verification-full-details: done
+  5-3-real-time-status-updates: done
+  5-4-timeline-event-history: done
+  5-5-file-delivery-access: done
+  epic-5-retrospective: optional
+
+  # Epic 6: Payments & Reporting (13 points, 5 stories)
+  epic-6: contexted
+  6-1-payment-tracker-dashboard: done
+  6-2-mark-projects-as-paid: done
+  6-3-profit-summary-reports: done
+  6-4-csv-export: done
+  6-5-discount-additional-charges: done
+  epic-6-retrospective: optional
+
+  # Epic 7: Notifications & Automation (23 points, 8 stories)
+  epic-7: contexted
+  7-1-email-service-integration: done
+  7-2-email-templates: done
+  7-3-submission-confirmation-email: done
+  7-4-payment-validation-emails: done
+  7-5-writer-assignment-notification: done
+  7-6-deadline-warning-system: done
+  7-7-project-completion-email: done
+  7-8-admin-daily-digest: done
+  epic-7-retrospective: optional

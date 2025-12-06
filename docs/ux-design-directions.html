@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startpoint Academics - Design Directions</title>
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --primary-light: #2d5a87;
+            --primary-dark: #152a45;
+            --accent: #d4a853;
+            --accent-light: #e4c078;
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --error: #dc2626;
+            --bg: #f8fafc;
+            --bg-alt: #f1f5f9;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .main-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .main-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .direction-nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary);
+            background: #f0f4ff;
+        }
+
+        .nav-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .direction-section {
+            display: none;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .direction-section.active {
+            display: block;
+        }
+
+        .direction-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .direction-header h2 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .direction-header .subtitle {
+            color: var(--text-muted);
+        }
+
+        .traits {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .trait {
+            padding: 0.35rem 0.75rem;
+            background: var(--bg-alt);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--primary);
+        }
+
+        .mockup-container {
+            background: var(--bg-alt);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .mockup-label {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mockup {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Common mockup elements */
+        .mock-nav {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: var(--primary);
+            color: white;
+        }
+
+        .mock-nav .logo {
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mock-nav .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            margin-left: auto;
+        }
+
+        .mock-nav .nav-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .mock-nav .nav-links a:hover {
+            color: white;
+        }
+
+        .mock-btn {
+            padding: 0.6rem 1.25rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .mock-btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .mock-btn-accent {
+            background: var(--accent);
+            color: var(--primary);
+        }
+
+        .mock-btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .mock-btn-white {
+            background: white;
+            color: var(--primary);
+        }
+
+        .mock-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .mock-badge-progress {
+            background: #dbeafe;
+            color: var(--primary);
+        }
+
+        .mock-badge-complete {
+            background: #dcfce7;
+            color: var(--success);
+        }
+
+        .mock-badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .mock-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+
+        /* Direction 1: Classic Professional */
+        .d1-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .d1-hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .d1-hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .d1-packages {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            padding: 2rem;
+            max-width: 900px;
+            margin: -3rem auto 0;
+        }
+
+        .d1-package {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+        }
+
+        .d1-package.featured {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .d1-package h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .d1-package .price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .d1-package .price span {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Direction 2: Modern Minimal */
+        .d2-hero {
+            padding: 5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .d2-hero-text {
+            max-width: 500px;
+        }
+
+        .d2-hero-text h1 {
+            font-size: 3rem;
+            color: var(--primary);
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .d2-hero-text p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .d2-hero-visual {
+            width: 400px;
+            height: 300px;
+            background: var(--bg-alt);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--border);
+        }
+
+        .d2-features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            padding: 3rem 2rem;
+            background: var(--bg-alt);
+        }
+
+        .d2-feature {
+            text-align: center;
+        }
+
+        .d2-feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+
+        /* Direction 3: Trust-Forward */
+        .d3-nav {
+            background: white;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .d3-hero {
+            background: var(--bg-alt);
+            padding: 4rem 2rem;
+        }
+
+        .d3-hero-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+        }
+
+        .d3-hero-text {
+            flex: 1;
+        }
+
+        .d3-hero-text h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .d3-trust-badges {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .d3-trust-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .d3-trust-badge .icon {
+            color: var(--success);
+        }
+
+        .d3-form-card {
+            flex: 0 0 380px;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .d3-form-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .d3-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        /* Tracking Page Mockups */
+        .track-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .track-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .track-header h1 {
+            color: var(--primary);
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .track-header .project-id {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Track Style 1: Stepper */
+        .track-stepper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .track-stepper::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 40px;
+            right: 40px;
+            height: 4px;
+            background: var(--border);
+            z-index: 0;
+        }
+
+        .track-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .track-step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .track-step.completed .track-step-circle {
+            background: var(--success);
+            color: white;
+        }
+
+        .track-step.current .track-step-circle {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(30,58,95,0.2);
+        }
+
+        .track-step-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .track-step.current .track-step-label,
+        .track-step.completed .track-step-label {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* Track Style 2: Timeline */
+        .track-timeline {
+            border-left: 3px solid var(--border);
+            padding-left: 2rem;
+            margin-left: 1rem;
+        }
+
+        .track-timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+
+        .track-timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.35rem;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--border);
+            border: 3px solid white;
+        }
+
+        .track-timeline-item.completed::before {
+            background: var(--success);
+        }
+
+        .track-timeline-item.current::before {
+            background: var(--primary);
+            box-shadow: 0 0 0 4px rgba(30,58,95,0.2);
+        }
+
+        .track-timeline-item h4 {
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .track-timeline-item .time {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .track-timeline-item .detail {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Track Style 3: Card-Focused */
+        .track-card-main {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+        }
+
+        .track-card-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 8px;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .track-card-status-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .track-card-status h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .track-card-status p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .track-progress-bar {
+            height: 8px;
+            background: var(--bg-alt);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .track-progress-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 4px;
+        }
+
+        .track-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .track-detail-item {
+            padding: 1rem;
+            background: var(--bg-alt);
+            border-radius: 8px;
+        }
+
+        .track-detail-item .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .track-detail-item .value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Admin Dashboard Mockups */
+        .admin-layout {
+            display: flex;
+            min-height: 500px;
+        }
+
+        .admin-sidebar {
+            width: 240px;
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem 0;
+        }
+
+        .admin-sidebar-logo {
+            padding: 0 1.5rem 1.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 1rem;
+        }
+
+        .admin-sidebar-item {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+        }
+
+        .admin-sidebar-item:hover,
+        .admin-sidebar-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .admin-main {
+            flex: 1;
+            padding: 1.5rem;
+            background: var(--bg);
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .admin-header h1 {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .admin-stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+        }
+
+        .admin-stat-card .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-stat-card .value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .admin-stat-card .change {
+            font-size: 0.8rem;
+            color: var(--success);
+            margin-top: 0.25rem;
+        }
+
+        .admin-table {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .admin-table-header {
+            display: flex;
+            padding: 1rem 1.25rem;
+            background: var(--bg-alt);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .admin-table-row {
+            display: flex;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+        }
+
+        .admin-table-row:last-child {
+            border-bottom: none;
+        }
+
+        .col-project { flex: 2; }
+        .col-client { flex: 1.5; }
+        .col-writer { flex: 1.5; }
+        .col-status { flex: 1; }
+        .col-amount { flex: 1; text-align: right; }
+
+        /* Admin Style 2: Top Nav */
+        .admin2-nav {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .admin2-nav .logo {
+            font-weight: 700;
+            color: var(--primary);
+            padding: 1rem 0;
+            margin-right: 2rem;
+        }
+
+        .admin2-nav .nav-item {
+            padding: 1rem 1rem;
+            color: var(--text-muted);
+            border-bottom: 3px solid transparent;
+            margin-bottom: -1px;
+        }
+
+        .admin2-nav .nav-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .admin2-content {
+            padding: 2rem;
+            background: var(--bg);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .d1-packages { grid-template-columns: 1fr; }
+            .d2-hero { flex-direction: column; text-align: center; }
+            .d2-hero-visual { display: none; }
+            .d2-features { grid-template-columns: 1fr; }
+            .d3-hero-inner { flex-direction: column; }
+            .d3-form-card { flex: none; width: 100%; }
+            .admin-stats { grid-template-columns: repeat(2, 1fr); }
+            .admin-layout { flex-direction: column; }
+            .admin-sidebar { width: 100%; }
+            .track-details-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-header">
+        <h1>🎨 Design Directions - Academic Trust Theme</h1>
+        <p>Explore different layout and visual approaches for Startpoint Academics</p>
+    </div>
+
+    <nav class="direction-nav">
+        <button class="nav-btn active" onclick="showDirection('landing1')">Landing: Classic</button>
+        <button class="nav-btn" onclick="showDirection('landing2')">Landing: Modern</button>
+        <button class="nav-btn" onclick="showDirection('landing3')">Landing: Trust-First</button>
+        <button class="nav-btn" onclick="showDirection('track1')">Tracking: Stepper</button>
+        <button class="nav-btn" onclick="showDirection('track2')">Tracking: Timeline</button>
+        <button class="nav-btn" onclick="showDirection('track3')">Tracking: Card-Focus</button>
+        <button class="nav-btn" onclick="showDirection('admin1')">Admin: Sidebar</button>
+        <button class="nav-btn" onclick="showDirection('admin2')">Admin: Top Nav</button>
+    </nav>
+
+    <!-- Landing Page: Classic Professional -->
+    <section class="direction-section active" id="landing1">
+        <div class="direction-header">
+            <h2>Landing Page: Classic Professional</h2>
+            <p class="subtitle">Centered hero with prominent pricing cards - traditional SaaS layout</p>
+            <div class="traits">
+                <span class="trait">Centered Layout</span>
+                <span class="trait">Pricing Prominent</span>
+                <span class="trait">Bold Hero</span>
+                <span class="trait">Familiar Pattern</span>
+            </div>
+        </div>
+
+        <div class="mockup-container">
+            <div class="mockup-label">Desktop View</div>
+            <div class="mockup">
+                <div class="mock-nav">
+                    <div class="logo">📚 Startpoint Academics</div>
+                    <div class="nav-links">
+                        <a href="#">Services</a>
+                        <a href="#">Pricing</a>
+                        <a href="#">About</a>
+                        <a href="#">Contact</a>
+                    </div>
+                </div>
+                <div class="d1-hero">
+                    <h1>Academic Excellence, Delivered</h1>
+                    <p>Professional writing support for students who demand quality. Transparent pricing, complete visibility, guaranteed satisfaction.</p>
+                    <button class="mock-btn mock-btn-accent">Get Started →</button>
+                </div>
+                <div class="d1-packages">
+                    <div class="d1-package">
+                        <h3>Essay</h3>
+                        <div class="price">$49<span>/page</span></div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 1rem 0;">Standard essays and short papers</p>
+                        <button class="mock-btn mock-btn-outline" style="width: 100%;">Select</button>
+                    </div>
+                    <div class="d1-package featured">
+                        <span class="mock-badge" style="background: var(--accent); color: var(--primary); margin-bottom: 0.5rem;">Most Popular</span>
+                        <h3>Research Paper</h3>
+                        <div class="price">$79<span>/page</span></div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 1rem 0;">In-depth research with citations</p>
+                        <button class="mock-btn mock-btn-primary" style="width: 100%;">Select</button>
+                    </div>
+                    <div class="d1-package">
+                        <h3>Thesis</h3>
+                        <div class="price">$99<span>/page</span></div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 1rem 0;">Comprehensive thesis support</p>
+                        <button class="mock-btn mock-btn-outline" style="width: 100%;">Select</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Landing Page: Modern Minimal -->
+    <section class="direction-section" id="landing2">
+        <div class="direction-header">
+            <h2>Landing Page: Modern Minimal</h2>
+            <p class="subtitle">Clean split layout with bold typography - contemporary tech feel</p>
+            <div class="traits">
+                <span class="trait">Split Layout</span>
+                <span class="trait">Large Typography</span>
+                <span class="trait">Whitespace Heavy</span>
+                <span class="trait">Modern Tech Feel</span>
+            </div>
+        </div>
+
+        <div class="mockup-container">
+            <div class="mockup-label">Desktop View</div>
+            <div class="mockup">
+                <div class="mock-nav" style="background: white; color: var(--text); border-bottom: 1px solid var(--border);">
+                    <div class="logo" style="color: var(--primary);">📚 Startpoint</div>
+                    <div class="nav-links">
+                        <a href="#" style="color: var(--text-muted);">How it works</a>
+                        <a href="#" style="color: var(--text-muted);">Pricing</a>
+                        <a href="#" style="color: var(--text-muted);">FAQ</a>
+                    </div>
+                </div>
+                <div class="d2-hero">
+                    <div class="d2-hero-text">
+                        <h1>Academic writing, simplified.</h1>
+                        <p>Submit your requirements, track progress in real-time, receive quality work. No surprises, no chasing for updates.</p>
+                        <button class="mock-btn mock-btn-primary">Start a project →</button>
+                        <button class="mock-btn mock-btn-outline" style="margin-left: 0.5rem;">View pricing</button>
+                    </div>
+                    <div class="d2-hero-visual">
+                        <span style="color: var(--text-muted);">[ Progress Tracker Preview ]</span>
+                    </div>
+                </div>
+                <div class="d2-features">
+                    <div class="d2-feature">
+                        <div class="d2-feature-icon">💰</div>
+                        <h3 style="color: var(--primary); margin-bottom: 0.5rem;">Transparent Pricing</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">See exact costs upfront. No hidden fees, no surprises.</p>
+                    </div>
+                    <div class="d2-feature">
+                        <div class="d2-feature-icon">👁️</div>
+                        <h3 style="color: var(--primary); margin-bottom: 0.5rem;">Real-Time Tracking</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Watch your project progress. Never wonder "what's the status?"</p>
+                    </div>
+                    <div class="d2-feature">
+                        <div class="d2-feature-icon">✓</div>
+                        <h3 style="color: var(--primary); margin-bottom: 0.5rem;">Quality Guaranteed</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Expert writers, thorough review, satisfaction guaranteed.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Landing Page: Trust-First -->
+    <section class="direction-section" id="landing3">
+        <div class="direction-header">
+            <h2>Landing Page: Trust-First</h2>
+            <p class="subtitle">Immediate form with trust signals - conversion-optimized</p>
+            <div class="traits">
+                <span class="trait">Form Prominent</span>
+                <span class="trait">Trust Signals</span>
+                <span class="trait">Conversion Focus</span>
+                <span class="trait">Action-Oriented</span>
+            </div>
+        </div>
+
+        <div class="mockup-container">
+            <div class="mockup-label">Desktop View</div>
+            <div class="mockup">
+                <div class="mock-nav d3-nav" style="background: white; color: var(--text);">
+                    <div class="logo" style="color: var(--primary);">📚 Startpoint Academics</div>
+                    <div class="nav-links">
+                        <a href="#" style="color: var(--text-muted);">How it works</a>
+                        <a href="#" style="color: var(--text-muted);">Pricing</a>
+                        <a href="#" style="color: var(--text-muted);">Reviews</a>
+                        <button class="mock-btn mock-btn-primary" style="margin-left: 1rem;">Track Order</button>
+                    </div>
+                </div>
+                <div class="d3-hero">
+                    <div class="d3-hero-inner">
+                        <div class="d3-hero-text">
+                            <h1>Get expert help with your academic writing</h1>
+                            <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1rem;">Professional writers, transparent process, real-time tracking. Join 500+ students who trust us.</p>
+                            <div class="d3-trust-badges">
+                                <div class="d3-trust-badge"><span class="icon">✓</span> 100% Original Work</div>
+                                <div class="d3-trust-badge"><span class="icon">✓</span> On-Time Delivery</div>
+                                <div class="d3-trust-badge"><span class="icon">✓</span> Money-Back Guarantee</div>
+                            </div>
+                        </div>
+                        <div class="d3-form-card">
+                            <h3>Start Your Project</h3>
+                            <select class="d3-input">
+                                <option>Select package type...</option>
+                                <option>Essay ($49/page)</option>
+                                <option>Research Paper ($79/page)</option>
+                                <option>Thesis ($99/page)</option>
+                            </select>
+                            <input type="text" class="d3-input" placeholder="Project topic...">
+                            <input type="date" class="d3-input" placeholder="Deadline">
+                            <button class="mock-btn mock-btn-accent" style="width: 100%;">Get Started →</button>
+                            <p style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">No payment required to submit</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tracking: Stepper -->
+    <section class="direction-section" id="track1">
+        <div class="direction-header">
+            <h2>Client Tracking: Horizontal Stepper</h2>
+            <p class="subtitle">Clear visual progression - like package tracking</p>
+            <div class="traits">
+                <span class="trait">Linear Progress</span>
+                <span class="trait">Clear Current State</span>
+                <span class="trait">Familiar Pattern</span>
+                <span class="trait">Scannable</span>
+            </div>
+        </div>
+
+        <div class="mockup-container">
+            <div class="mockup-label">Client Tracking Page</div>
+            <div class="mockup">
+                <div class="mock-nav">
+                    <div class="logo">📚 Startpoint Academics</div>
+                </div>
+                <div class="track-container">
+                    <div class="track-header">
+                        <h1>Research Paper - Economics</h1>
+                        <p class="project-id">Project #SA-2024-1234</p>
+                    </div>
+
+                    <div class="track-stepper">
+                        <div class="track-step completed">
+                            <div class="track-step-circle">✓</div>
+                            <span class="track-step-label">Submitted</span>
+                        </div>
+                        <div class="track-step completed">
+                            <div class="track-step-circle">✓</div>
+                            <span class="track-step-label">Assigned</span>
+                        </div>
+                        <div class="track-step current">
+                            <div class="track-step-circle">3</div>
+                            <span class="track-step-label">In Progress</span>
+                        </div>
+                        <div class="track-step">
+                            <div class="track-step-circle">4</div>
+                            <span class="track-step-label">Review</span>
+                        </div>
+                        <div class="track-step">
+                            <div class="track-step-circle">5</div>
+                            <span class="track-step-label">Complete</span>
+                        </div>
+                    </div>
+
+                    <div class="mock-card">
+                        <h3 style="color: var(--primary); margin-bottom: 1rem;">Project Details</h3>
+                        <div class="track-details-grid">
+                            <div class="track-detail-item">
+                                <div class="label">Writer</div>
+                                <div class="value">Sarah M.</div>
+                            </div>
+                            <div class="track-detail-item">
+                                <div class="label">Deadline</div>
+                                <div class="value">Dec 5, 2025</div>
+                            </div>
+                            <div class="track-detail-item">
+                                <div class="label">Package</div>
+                                <div class="value">Research Paper</div>
+                            </div>
+                            <div class="track-detail-item">
+                                <div class="label">Pages</div>
+                                <div class="value">10 pages</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tracking: Timeline -->
+    <section class="direction-section" id="track2">
+        <div class="direction-header">
+            <h2>Client Tracking: Vertical Timeline</h2>
+            <p class="subtitle">Shows history and updates - more detailed view</p>
+            <div class="traits">
+                <span class="trait">Update History</span>
+                <span class="trait">Timestamps</span>
+                <span class="trait">Detailed Progress</span>
+                <span class="trait">Story-like</span>
+            </div>
+        </div>
+
+        <div class="mockup-container">
+            <div class="mockup-label">Client Tracking Page</div>
+            <div class="mockup">
+                <div class="mock-nav">
+                    <div class="logo">📚 Startpoint Academics</div>
+                </div>
+                <div class="track-container">
+                    <div class="track-header">
+                        <h1>Research Paper - Economics</h1>
+                        <p class="project-id">Project #SA-2024-1234 • Due: Dec 5, 2025</p>
+                    </div>
+
+                    <div class="track-timeline">
+                        <div class="track-timeline-item completed">
+                            <h4>Project Submitted</h4>
+                            <span class="time">Nov 28, 2025 at 2:34 PM</span>
+                            <p class="detail">Your requirements have been received and are being reviewed.</p>
+                        </div>
+                        <div class="track-timeline-item completed">
+                            <h4>Writer Assigned</h4>
+                            <span class="time">Nov 28, 2025 at 4:15 PM</span>
+                            <p class="detail">Sarah M. has been assigned to your project. She specializes in Economics research.</p>
+                        </div>
+                        <div class="track-timeline-item current">
+                            <h4>In Progress</h4>
+                            <span class="time">Nov 29, 2025 at 9:00 AM</span>
+                            <p class="detail">Sarah has started working on your research paper. Initial research phase underway.</p>
+                        </div>
+                        <div class="track-timeline-item">
+                            <h4>Under Review</h4>
+                            <span class="time">Pending</span>
+                        </div>
+                        <div class="track-timeline-item">
+                            <h4>Completed</h4>
+                            <span class="time">Pending</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tracking: Card-Focus -->
+    <section class="direction-section" id="track3">
+        <div class="direction-header">
+            <h2>Client Tracking: Card-Focused</h2>
+            <p class="subtitle">Status as hero element - maximum clarity</p>
+            <div class="traits">
+                <span class="trait">Status Hero</span>
+                <span class="trait">Progress Bar</span>
+                <span class="trait">Card Layout</span>
+                <span class="trait">Maximum Clarity</span>
+            </div>
+        </div>
+
+        <div class="mockup-container">
+            <div class="mockup-label">Client Tracking Page</div>
+            <div class="mockup">
+                <div class="mock-nav">
+                    <div class="logo">📚 Startpoint Academics</div>
+                </div>
+                <div class="track-container">
+                    <div class="track-card-main">
+                        <div class="track-card-status">
+                            <div class="track-card-status-icon">📝</div>
+                            <div>
+                                <h3>In Progress</h3>
+                                <p>Sarah M. is working on your research paper</p>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 0.5rem; display: flex; justify-content: space-between;">
+                            <span style="font-size: 0.9rem; color: var(--text-muted);">Progress</span>
+                            <span style="font-weight: 600; color: var(--primary);">60%</span>
+                        </div>
+                        <div class="track-progress-bar">
+                            <div class="fill" style="width: 60%;"></div>
+                        </div>
+
+                        <div class="track-details-grid" style="margin-top: 1.5rem;">
+                            <div class="track-detail-item">
+                                <div class="label">Project</div>
+                                <div class="value">Research Paper - Economics</div>
+                            </div>
+                            <div class="track-detail-item">
+                                <div class="label">Deadline</div>
+                                <div class="value">Dec 5, 2025</div>
+                            </div>
+                            <div class="track-detail-item">
+                                <div class="label">Writer</div>
+                                <div class="value">Sarah M.</div>
+                            </div>
+                            <div class="track-detail-item">
+                                <div class="label">Last Update</div>
+                                <div class="value">2 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mock-card">
+                        <h4 style="color: var(--primary); margin-bottom: 1rem;">Files</h4>
+                        <p style="color: var(--text-muted);">Files will appear here when your project is complete.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin: Sidebar -->
+    <section class="direction-section" id="admin1">
+        <div class="direction-header">
+            <h2>Admin Dashboard: Sidebar Navigation</h2>
+            <p class="subtitle">Classic dashboard layout with persistent navigation</p>
+            <div class="traits">
+                <span class="trait">Sidebar Nav</span>
+                <span class="trait">Stats Prominent</span>
+                <span class="trait">Table View</span>
+                <span class="trait">Dense Info</span>
+            </div>
+        </div>
+
+        <div class="mockup-container">
+            <div class="mockup-label">Admin Dashboard</div>
+            <div class="mockup">
+                <div class="admin-layout">
+                    <div class="admin-sidebar">
+                        <div class="admin-sidebar-logo">📚 Startpoint</div>
+                        <div class="admin-sidebar-item active">📊 Dashboard</div>
+                        <div class="admin-sidebar-item">📁 Projects</div>
+                        <div class="admin-sidebar-item">👥 Writers</div>
+                        <div class="admin-sidebar-item">📦 Packages</div>
+                        <div class="admin-sidebar-item">💰 Payments</div>
+                        <div class="admin-sidebar-item">⚙️ Settings</div>
+                    </div>
+                    <div class="admin-main">
+                        <div class="admin-header">
+                            <h1>Dashboard</h1>
+                            <button class="mock-btn mock-btn-primary">+ New Project</button>
+                        </div>
+
+                        <div class="admin-stats">
+                            <div class="admin-stat-card">
+                                <div class="label">Active Projects</div>
+                                <div class="value">12</div>
+                                <div class="change">↑ 3 this week</div>
+                            </div>
+                            <div class="admin-stat-card">
+                                <div class="label">Revenue (Month)</div>
+                                <div class="value">$2,450</div>
+                                <div class="change">↑ 18% vs last month</div>
+                            </div>
+                            <div class="admin-stat-card">
+                                <div class="label">Your Share (40%)</div>
+                                <div class="value">$980</div>
+                            </div>
+                            <div class="admin-stat-card">
+                                <div class="label">On-Time Rate</div>
+                                <div class="value">98%</div>
+                            </div>
+                        </div>
+
+                        <div class="admin-table">
+                            <div class="admin-table-header">
+                                <span class="col-project">Project</span>
+                                <span class="col-client">Client</span>
+                                <span class="col-writer">Writer</span>
+                                <span class="col-status">Status</span>
+                                <span class="col-amount">Amount</span>
+                            </div>
+                            <div class="admin-table-row">
+                                <span class="col-project"><strong>Research Paper - Economics</strong></span>
+                                <span class="col-client">John D.</span>
+                                <span class="col-writer">Sarah M.</span>
+                                <span class="col-status"><span class="mock-badge mock-badge-progress">In Progress</span></span>
+                                <span class="col-amount">$790</span>
+                            </div>
+                            <div class="admin-table-row">
+                                <span class="col-project"><strong>Essay - History</strong></span>
+                                <span class="col-client">Mike R.</span>
+                                <span class="col-writer">Alex K.</span>
+                                <span class="col-status"><span class="mock-badge mock-badge-pending">Pending</span></span>
+                                <span class="col-amount">$245</span>
+                            </div>
+                            <div class="admin-table-row">
+                                <span class="col-project"><strong>Thesis Chapter - Biology</strong></span>
+                                <span class="col-client">Emma S.</span>
+                                <span class="col-writer">Sarah M.</span>
+                                <span class="col-status"><span class="mock-badge mock-badge-complete">Complete</span></span>
+                                <span class="col-amount">$990</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin: Top Nav -->
+    <section class="direction-section" id="admin2">
+        <div class="direction-header">
+            <h2>Admin Dashboard: Top Navigation</h2>
+            <p class="subtitle">Horizontal nav with full-width content area</p>
+            <div class="traits">
+                <span class="trait">Top Nav</span>
+                <span class="trait">Full Width</span>
+                <span class="trait">Tab-Based</span>
+                <span class="trait">More Content Space</span>
+            </div>
+        </div>
+
+        <div class="mockup-container">
+            <div class="mockup-label">Admin Dashboard</div>
+            <div class="mockup">
+                <div class="admin2-nav">
+                    <div class="logo">📚 Startpoint Academics</div>
+                    <div class="nav-item active">Dashboard</div>
+                    <div class="nav-item">Projects</div>
+                    <div class="nav-item">Writers</div>
+                    <div class="nav-item">Packages</div>
+                    <div class="nav-item">Payments</div>
+                    <div style="margin-left: auto; padding: 0.5rem 0;">
+                        <button class="mock-btn mock-btn-primary">+ New Project</button>
+                    </div>
+                </div>
+                <div class="admin2-content">
+                    <div class="admin-stats" style="grid-template-columns: repeat(4, 1fr);">
+                        <div class="admin-stat-card">
+                            <div class="label">Active Projects</div>
+                            <div class="value">12</div>
+                            <div class="change">↑ 3 this week</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="label">Revenue (Month)</div>
+                            <div class="value">$2,450</div>
+                            <div class="change">↑ 18% vs last month</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="label">Your Share (40%)</div>
+                            <div class="value">$980</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="label">On-Time Rate</div>
+                            <div class="value">98%</div>
+                        </div>
+                    </div>
+
+                    <div class="admin-table">
+                        <div class="admin-table-header">
+                            <span class="col-project">Project</span>
+                            <span class="col-client">Client</span>
+                            <span class="col-writer">Writer</span>
+                            <span class="col-status">Status</span>
+                            <span class="col-amount">Amount</span>
+                        </div>
+                        <div class="admin-table-row">
+                            <span class="col-project"><strong>Research Paper - Economics</strong></span>
+                            <span class="col-client">John D.</span>
+                            <span class="col-writer">Sarah M.</span>
+                            <span class="col-status"><span class="mock-badge mock-badge-progress">In Progress</span></span>
+                            <span class="col-amount">$790</span>
+                        </div>
+                        <div class="admin-table-row">
+                            <span class="col-project"><strong>Essay - History</strong></span>
+                            <span class="col-client">Mike R.</span>
+                            <span class="col-writer">Alex K.</span>
+                            <span class="col-status"><span class="mock-badge mock-badge-pending">Pending</span></span>
+                            <span class="col-amount">$245</span>
+                        </div>
+                        <div class="admin-table-row">
+                            <span class="col-project"><strong>Thesis Chapter - Biology</strong></span>
+                            <span class="col-client">Emma S.</span>
+                            <span class="col-writer">Sarah M.</span>
+                            <span class="col-status"><span class="mock-badge mock-badge-complete">Complete</span></span>
+                            <span class="col-amount">$990</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function showDirection(id) {
+            document.querySelectorAll('.direction-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
