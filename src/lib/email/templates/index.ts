@@ -12,4 +12,5 @@ export {
 } from "./deadline-warning";
 export { projectCompletionEmail } from "./project-completion";
 export { adminDailyDigestEmail } from "./admin-digest";
+export { writerWelcomeEmail } from "./writer-welcome";
 export { emailLayout } from "./layout";

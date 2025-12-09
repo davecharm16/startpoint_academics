@@ -143,6 +143,7 @@ INSERT INTO payment_methods (name, account_number, account_name, additional_inst
 -- ============================================
 
 -- Create test users in auth.users (local dev only)
+-- Note: Token columns must be empty strings (not NULL) for GoTrue compatibility
 INSERT INTO auth.users (
   id,
   instance_id,
@@ -154,7 +155,15 @@ INSERT INTO auth.users (
   created_at,
   updated_at,
   role,
-  aud
+  aud,
+  confirmation_token,
+  recovery_token,
+  email_change_token_new,
+  email_change,
+  email_change_token_current,
+  phone_change,
+  phone_change_token,
+  reauthentication_token
 ) VALUES
 -- Admin User
 (
@@ -168,7 +177,8 @@ INSERT INTO auth.users (
   NOW(),
   NOW(),
   'authenticated',
-  'authenticated'
+  'authenticated',
+  '', '', '', '', '', '', '', ''
 ),
 -- Writer 1
 (
@@ -182,7 +192,8 @@ INSERT INTO auth.users (
   NOW(),
   NOW(),
   'authenticated',
-  'authenticated'
+  'authenticated',
+  '', '', '', '', '', '', '', ''
 ),
 -- Writer 2
 (
@@ -196,7 +207,8 @@ INSERT INTO auth.users (
   NOW(),
   NOW(),
   'authenticated',
-  'authenticated'
+  'authenticated',
+  '', '', '', '', '', '', '', ''
 );
 
 -- Create identities for the users (required for email login)

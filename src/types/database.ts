@@ -65,6 +65,9 @@ export interface Database {
           phone: string | null;
           is_active: boolean;
           max_concurrent_projects: number;
+          must_change_password: boolean;
+          created_by: string | null;
+          invited_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -76,6 +79,9 @@ export interface Database {
           phone?: string | null;
           is_active?: boolean;
           max_concurrent_projects?: number;
+          must_change_password?: boolean;
+          created_by?: string | null;
+          invited_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -87,6 +93,9 @@ export interface Database {
           phone?: string | null;
           is_active?: boolean;
           max_concurrent_projects?: number;
+          must_change_password?: boolean;
+          created_by?: string | null;
+          invited_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };

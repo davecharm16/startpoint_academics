@@ -17,7 +17,18 @@
       "Bash(PGPASSWORD=postgres psql:*)",
       "Bash(docker exec:*)",
       "Bash(git remote add:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(cat:*)",
+      "SlashCommand(/bmad:bmm:workflows:retrospective)",
+      "Bash(npm run test:smoke:*)",
+      "Bash(chmod:*)",
+      "Bash(bash scripts/smoke-test.sh:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker logs:*)"
     ],
     "deny": [],
     "ask": []

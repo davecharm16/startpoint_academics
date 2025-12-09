@@ -10,7 +10,8 @@ import { WriterAssignmentDialog } from "@/components/admin/writer-assignment-dia
 import { PaymentValidation } from "@/components/admin/payment-validation";
 import { PriceAdjustments } from "@/components/admin/price-adjustments";
 import { ProjectStatusActions } from "@/components/admin/project-status-actions";
-import { ArrowLeft, ExternalLink, User, Calendar, Phone, Mail, FileText, UserPlus } from "lucide-react";
+import { FileUpload } from "@/components/writer/file-upload";
+import { ArrowLeft, ExternalLink, User, Calendar, Phone, Mail, FileText, UserPlus, Upload } from "lucide-react";
 
 interface ProjectDetailPageProps {
   params: Promise<{ id: string }>;
@@ -63,6 +64,15 @@ interface WriterRow {
   full_name: string;
   email: string;
   max_concurrent_projects: number;
+}
+
+interface FileRow {
+  id: string;
+  file_name: string;
+  file_size: number;
+  file_type: string;
+  created_at: string;
+  profiles: { full_name: string } | null;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -149,6 +159,22 @@ export default async function ProjectDetailPage({
     .order("created_at", { ascending: false });
 
   const history = historyData as HistoryRow[] | null;
+
+  // Fetch project files
+  const { data: filesData } = await supabase
+    .from("project_files")
+    .select(`
+      id,
+      file_name,
+      file_size,
+      file_type,
+      created_at,
+      profiles!project_files_uploaded_by_fkey (full_name)
+    `)
+    .eq("project_id", id)
+    .order("created_at", { ascending: false });
+
+  const files = (filesData as FileRow[] | null) || [];
 
   // Transform history for timeline
   const timelineEvents =
@@ -385,6 +411,24 @@ export default async function ProjectDetailPage({
               </CardContent>
             </Card>
           )}
+
+          {/* Project Files */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="h-5 w-5" />
+                Project Files
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FileUpload
+                projectId={project.id}
+                files={files}
+                canUpload={true}
+                canDelete={true}
+              />
+            </CardContent>
+          </Card>
 
           {/* Timeline */}
           <Card>

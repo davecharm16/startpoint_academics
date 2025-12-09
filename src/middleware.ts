@@ -73,7 +73,7 @@ export async function middleware(request: NextRequest) {
     // Get user profile for role check
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role, is_active")
+      .select("role, is_active, must_change_password")
       .eq("id", user.id)
       .single();
 
@@ -81,6 +81,11 @@ export async function middleware(request: NextRequest) {
     if (!profile || !profile.is_active) {
       await supabase.auth.signOut();
       return NextResponse.redirect(new URL("/auth/login", request.url));
+    }
+
+    // Force password change if required
+    if (profile.must_change_password) {
+      return NextResponse.redirect(new URL("/auth/change-password", request.url));
     }
 
     // Admin routes - require admin role
@@ -101,6 +106,25 @@ export async function middleware(request: NextRequest) {
       }
       // Otherwise redirect to login
       return NextResponse.redirect(new URL("/auth/login", request.url));
+    }
+  }
+
+  // Change password page - require user to be logged in with must_change_password flag
+  if (pathname === "/auth/change-password") {
+    if (!user) {
+      return NextResponse.redirect(new URL("/auth/login", request.url));
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("must_change_password, role")
+      .eq("id", user.id)
+      .single();
+
+    // If user doesn't need to change password, redirect to dashboard
+    if (profile && !profile.must_change_password) {
+      const redirectTo = profile.role === "admin" ? "/admin" : "/writer";
+      return NextResponse.redirect(new URL(redirectTo, request.url));
     }
   }
 

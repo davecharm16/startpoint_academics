@@ -107,26 +107,26 @@ export function PaymentStep({
             onValueChange={(value) => setValue("payment_method_id", value)}
           >
             {paymentMethods.map((method) => (
-              <div
+              <label
                 key={method.id}
+                htmlFor={method.id}
                 className={`flex items-start space-x-3 p-4 border rounded-lg cursor-pointer transition-colors ${
                   selectedMethodId === method.id
                     ? "border-primary bg-primary/5"
                     : "border-border hover:border-primary/50"
                 }`}
-                onClick={() => setValue("payment_method_id", method.id)}
               >
-                <RadioGroupItem value={method.id} id={method.id} />
+                <RadioGroupItem value={method.id} id={method.id} className="mt-1" />
                 <div className="flex-1">
-                  <Label htmlFor={method.id} className="cursor-pointer font-medium">
+                  <span className="cursor-pointer font-medium">
                     {method.name}
-                  </Label>
+                  </span>
                   <div className="mt-1 text-sm text-muted-foreground">
                     <p>{method.account_name}</p>
                     <p className="font-mono">{method.account_number}</p>
                   </div>
                 </div>
-              </div>
+              </label>
             ))}
           </RadioGroup>
         </div>

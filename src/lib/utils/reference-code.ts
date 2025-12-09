@@ -1,19 +1,35 @@
-import { createRouteClient } from "@/lib/supabase/route";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * Generates a unique reference code for a project
  * Format: SA-YYYY-NNNNN (e.g., SA-2025-00001)
  */
 export async function generateReferenceCode(): Promise<string> {
-  const supabase = createRouteClient();
+  const supabase = createAdminClient();
   const year = new Date().getFullYear();
+  const prefix = `SA-${year}-`;
 
-  // Get count of projects this year
-  const { count } = await supabase
+  // Get the highest reference code for this year
+  const { data: dataResult } = await supabase
     .from("projects")
-    .select("*", { count: "exact", head: true })
-    .gte("created_at", `${year}-01-01`);
+    .select("reference_code")
+    .like("reference_code", `${prefix}%`)
+    .order("reference_code", { ascending: false })
+    .limit(1)
+    .single();
 
-  const sequence = String((count ?? 0) + 1).padStart(5, "0");
-  return `SA-${year}-${sequence}`;
+  const data = dataResult as { reference_code: string } | null;
+
+  let nextNumber = 1;
+
+  if (data?.reference_code) {
+    // Extract the number part from the reference code
+    const match = data.reference_code.match(/SA-\d{4}-(\d{5})/);
+    if (match) {
+      nextNumber = parseInt(match[1], 10) + 1;
+    }
+  }
+
+  const sequence = String(nextNumber).padStart(5, "0");
+  return `${prefix}${sequence}`;
 }

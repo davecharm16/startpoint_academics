@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StatusStepper } from "@/components/tracking/status-stepper";
@@ -53,11 +53,11 @@ const STATUS_LABELS: Record<string, string> = {
 
 export default async function TrackingPage({ params }: TrackingPageProps) {
   const { token } = await params;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const cookieStore = await cookies();
 
   // Fetch project by tracking token
-  const { data: projectData } = await supabase
+  const { data: projectData, error } = await supabase
     .from("projects")
     .select(`
       id,
@@ -73,10 +73,14 @@ export default async function TrackingPage({ params }: TrackingPageProps) {
       estimated_completion_at,
       created_at,
       delivery_link,
-      packages!projects_package_id_fkey (name)
+      packages (name)
     `)
     .eq("tracking_token", token)
     .single();
+
+  if (error) {
+    console.error("Tracking page query error:", error);
+  }
 
   const project = projectData as ProjectRow | null;
 

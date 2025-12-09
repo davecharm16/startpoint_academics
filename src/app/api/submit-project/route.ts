@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createRouteClient } from "@/lib/supabase/route";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { generateReferenceCode } from "@/lib/utils/reference-code";
 import { notifySubmissionConfirmation } from "@/lib/email/notifications";
 import type { Database } from "@/types/database";
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createRouteClient();
+    const supabase = createAdminClient();
 
     // Generate unique reference code and tracking token
     const referenceCode = await generateReferenceCode();

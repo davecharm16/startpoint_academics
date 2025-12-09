@@ -9,6 +9,7 @@ import { Timeline } from "@/components/tracking/timeline";
 import { WriterStatusActions } from "@/components/writer/status-actions";
 import { WriterNoteForm } from "@/components/writer/note-form";
 import { EstimatedCompletionForm } from "@/components/writer/estimated-completion-form";
+import { FileUpload } from "@/components/writer/file-upload";
 import {
   ArrowLeft,
   Calendar,
@@ -16,6 +17,11 @@ import {
   FileText,
   DollarSign,
   AlertTriangle,
+  User,
+  Mail,
+  Phone,
+  ClipboardList,
+  Upload,
 } from "lucide-react";
 
 interface ProjectDetailPageProps {
@@ -25,6 +31,9 @@ interface ProjectDetailPageProps {
 interface ProjectRow {
   id: string;
   reference_code: string;
+  client_name: string;
+  client_email: string;
+  client_phone: string | null;
   topic: string;
   requirements: string;
   deadline: string;
@@ -34,6 +43,7 @@ interface ProjectRow {
   writer_share: number;
   estimated_completion_at: string | null;
   created_at: string;
+  assigned_at: string | null;
   packages: { name: string } | null;
 }
 
@@ -43,6 +53,15 @@ interface HistoryRow {
   old_status: string | null;
   new_status: string | null;
   notes: string | null;
+  created_at: string;
+  profiles: { full_name: string } | null;
+}
+
+interface FileRow {
+  id: string;
+  file_name: string;
+  file_size: number;
+  file_type: string;
   created_at: string;
   profiles: { full_name: string } | null;
 }
@@ -85,12 +104,15 @@ export default async function WriterProjectDetailPage({
     redirect("/auth/login");
   }
 
-  // Fetch project
+  // Fetch project with full details
   const { data: projectData } = await supabase
     .from("projects")
     .select(`
       id,
       reference_code,
+      client_name,
+      client_email,
+      client_phone,
       topic,
       requirements,
       deadline,
@@ -100,6 +122,7 @@ export default async function WriterProjectDetailPage({
       writer_share,
       estimated_completion_at,
       created_at,
+      assigned_at,
       packages!projects_package_id_fkey (name)
     `)
     .eq("id", id)
@@ -128,6 +151,22 @@ export default async function WriterProjectDetailPage({
     .order("created_at", { ascending: false });
 
   const history = historyData as HistoryRow[] | null;
+
+  // Fetch project files
+  const { data: filesData } = await supabase
+    .from("project_files")
+    .select(`
+      id,
+      file_name,
+      file_size,
+      file_type,
+      created_at,
+      profiles!project_files_uploaded_by_fkey (full_name)
+    `)
+    .eq("project_id", id)
+    .order("created_at", { ascending: false });
+
+  const files = (filesData as FileRow[] | null) || [];
 
   // Transform history for timeline
   const timelineEvents =
@@ -213,6 +252,62 @@ export default async function WriterProjectDetailPage({
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Client Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Client Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                    <User className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Client Name</p>
+                    <p className="font-medium">{project.client_name}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                    <Mail className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Email</p>
+                    <p className="font-medium">{project.client_email}</p>
+                  </div>
+                </div>
+                {project.client_phone && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                      <Phone className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Phone</p>
+                      <p className="font-medium">{project.client_phone}</p>
+                    </div>
+                  </div>
+                )}
+                {project.assigned_at && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                      <Calendar className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Assigned Date</p>
+                      <p className="font-medium">
+                        {format(new Date(project.assigned_at), "MMM d, yyyy")}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Project Brief */}
           <Card>
             <CardHeader>
@@ -224,7 +319,7 @@ export default async function WriterProjectDetailPage({
             <CardContent className="space-y-4">
               <div>
                 <p className="text-sm text-muted-foreground">Topic</p>
-                <p className="font-medium">{project.topic}</p>
+                <p className="font-medium text-lg">{project.topic}</p>
               </div>
 
               {requirementsData.expected_outputs && (
@@ -251,6 +346,53 @@ export default async function WriterProjectDetailPage({
                   </p>
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Full Requirements */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ClipboardList className="h-5 w-5" />
+                Complete Requirements
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {Object.entries(requirementsData).map(([key, value]) => {
+                  // Format the key for display
+                  const formattedKey = key
+                    .replace(/_/g, " ")
+                    .replace(/\b\w/g, (l) => l.toUpperCase());
+
+                  return (
+                    <div key={key} className="border-b pb-3 last:border-0 last:pb-0">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        {formattedKey}
+                      </p>
+                      <p className="mt-1 whitespace-pre-wrap">{value}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* File Upload */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="h-5 w-5" />
+                Project Files
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FileUpload
+                projectId={project.id}
+                files={files}
+                canUpload={isActive}
+                canDelete={isActive}
+              />
             </CardContent>
           </Card>
 

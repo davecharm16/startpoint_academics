@@ -2,13 +2,14 @@
 
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Timeline } from "@/components/tracking/timeline";
-import { FileText, Download, ExternalLink } from "lucide-react";
+import { FileDownloads } from "@/components/tracking/file-downloads";
+import { FileText } from "lucide-react";
 
 interface Project {
   id: string;
   reference_code: string;
+  tracking_token: string;
   client_name: string;
   topic: string;
   requirements: string;
@@ -50,45 +51,13 @@ export function TrackingDetails({
     requirementsData = { raw: project.requirements };
   }
 
-  const isComplete = project.status === "complete" || project.status === "paid";
-
   return (
     <div className="space-y-6">
-      {/* File Delivery */}
-      {isComplete && (
-        <Card className="border-green-200 bg-green-50/50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-800">
-              <Download className="h-5 w-5" />
-              Your Project is Ready!
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {project.delivery_link ? (
-              <div className="space-y-3">
-                <p className="text-green-700">
-                  Your completed work is available for download.
-                </p>
-                <Button asChild className="w-full sm:w-auto">
-                  <a
-                    href={project.delivery_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    Access Deliverables
-                  </a>
-                </Button>
-              </div>
-            ) : (
-              <p className="text-green-700">
-                Your project is complete! The delivery link will be available
-                shortly. Please check back soon.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      )}
+      {/* File Downloads */}
+      <FileDownloads
+        trackingToken={project.tracking_token}
+        projectStatus={project.status}
+      />
 
       {/* Project Brief */}
       <Card>
