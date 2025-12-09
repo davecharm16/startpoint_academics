@@ -13,4 +13,5 @@ export {
 export { projectCompletionEmail } from "./project-completion";
 export { adminDailyDigestEmail } from "./admin-digest";
 export { writerWelcomeEmail } from "./writer-welcome";
+export { passwordResetEmail } from "./password-reset";
 export { emailLayout } from "./layout";
