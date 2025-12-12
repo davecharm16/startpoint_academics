@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Protected routes handling
-  if (pathname.startsWith("/admin") || pathname.startsWith("/writer")) {
+  if (pathname.startsWith("/admin") || pathname.startsWith("/writer") || pathname.startsWith("/client")) {
     // Not logged in - redirect to login
     if (!user) {
       const loginUrl = new URL("/auth/login", request.url);
@@ -103,6 +103,24 @@ export async function middleware(request: NextRequest) {
       // If admin trying to access writer, redirect to admin dashboard
       if (profile.role === "admin") {
         return NextResponse.redirect(new URL("/admin", request.url));
+      }
+      // If client trying to access writer, redirect to client dashboard
+      if (profile.role === "client") {
+        return NextResponse.redirect(new URL("/client", request.url));
+      }
+      // Otherwise redirect to login
+      return NextResponse.redirect(new URL("/auth/login", request.url));
+    }
+
+    // Client routes - require client role
+    if (pathname.startsWith("/client") && profile.role !== "client") {
+      // If admin trying to access client, redirect to admin dashboard
+      if (profile.role === "admin") {
+        return NextResponse.redirect(new URL("/admin", request.url));
+      }
+      // If writer trying to access client, redirect to writer dashboard
+      if (profile.role === "writer") {
+        return NextResponse.redirect(new URL("/writer", request.url));
       }
       // Otherwise redirect to login
       return NextResponse.redirect(new URL("/auth/login", request.url));

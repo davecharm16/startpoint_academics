@@ -77,12 +77,23 @@ startpoint-academics/
 │   │   │   │   ├── writers/page.tsx     # Writer management
 │   │   │   │   ├── packages/page.tsx    # Package management
 │   │   │   │   ├── payments/page.tsx    # Payment tracker
-│   │   │   │   └── settings/page.tsx    # Payment config
+│   │   │   │   ├── referrals/           # Epic 8: Referral analytics
+│   │   │   │   │   ├── page.tsx         # Referral dashboard
+│   │   │   │   │   └── payouts/page.tsx # Payout processing
+│   │   │   │   ├── social-claims/page.tsx # Epic 8: Social verification
+│   │   │   │   └── settings/page.tsx    # Payment + Referral + Social config
 │   │   │   │
-│   │   │   └── writer/
-│   │   │       ├── page.tsx             # Writer dashboard
-│   │   │       └── projects/
-│   │   │           └── [id]/page.tsx    # Assignment detail
+│   │   │   ├── writer/
+│   │   │   │   ├── page.tsx             # Writer dashboard
+│   │   │   │   └── projects/
+│   │   │   │       └── [id]/page.tsx    # Assignment detail
+│   │   │   │
+│   │   │   └── client/                  # Epic 8: Client portal
+│   │   │       ├── page.tsx             # Client dashboard
+│   │   │       ├── projects/page.tsx    # All client projects
+│   │   │       ├── referrals/page.tsx   # Referral dashboard
+│   │   │       ├── social-rewards/page.tsx # Social rewards
+│   │   │       └── profile/page.tsx     # Profile management
 │   │   │
 │   │   ├── api/                         # API routes (if needed)
 │   │   │   └── webhooks/
@@ -111,6 +122,7 @@ startpoint-academics/
 │   │   └── layout/
 │   │       ├── admin-sidebar.tsx        # Admin navigation
 │   │       ├── writer-nav.tsx           # Writer navigation
+│   │       ├── client-nav.tsx           # Client navigation (Epic 8)
 │   │       └── public-header.tsx        # Public header
 │   │
 │   ├── lib/
@@ -125,6 +137,7 @@ startpoint-academics/
 │   │   ├── utils/
 │   │   │   ├── reference-code.ts        # Generate SA-XXXX codes
 │   │   │   ├── split-calculator.ts      # 60/40 calculation
+│   │   │   ├── referral-code.ts         # Generate referral codes (Epic 8)
 │   │   │   └── date-utils.ts            # Date formatting
 │   │   └── constants.ts                 # App constants
 │   │
@@ -166,6 +179,9 @@ startpoint-academics/
 | Payment Validation (FR40-42, FR43, FR45) | `/admin/payments` | payment-validator | projects, payment_proofs, payment_methods |
 | Notifications (FR8, FR15, FR30, FR47) | API routes | - | project_history (triggers) |
 | System (FR29, FR31-34) | - | - | Database functions, RLS |
+| Client Accounts (FR56-61) | `/auth/*`, `/client/*` | client-nav, profile-form | profiles |
+| Referral System (FR62-71) | `/client/referrals`, `/admin/referrals/*` | referral-dashboard, leaderboard | referrals, reward_transactions, payout_requests, referral_settings |
+| Social Marketing (FR72-76) | `/client/social-rewards`, `/admin/social-claims` | social-claim-form, verification-queue | social_claims, social_reward_settings |
 
 ## Technology Stack Details
 
@@ -218,13 +234,18 @@ startpoint-academics/
 -- Users (extends Supabase auth.users)
 CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id),
-  role TEXT NOT NULL CHECK (role IN ('admin', 'writer')),
+  role TEXT NOT NULL CHECK (role IN ('admin', 'writer', 'client')),
   full_name TEXT NOT NULL,
   email TEXT NOT NULL,
   phone TEXT,
   is_active BOOLEAN DEFAULT true,
   -- Writer workload management (from Stakeholder Mapping)
   max_concurrent_projects INTEGER DEFAULT 5,
+  -- Client referral system (Epic 8)
+  referral_code TEXT UNIQUE,  -- e.g., DAVE2024 (clients only)
+  referred_by UUID REFERENCES profiles(id),  -- Who referred this client
+  referral_discount_used BOOLEAN DEFAULT false,  -- One-time discount tracking
+  reward_balance DECIMAL(10,2) DEFAULT 0,  -- Combined referral + social rewards
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -263,11 +284,12 @@ CREATE TABLE projects (
   reference_code TEXT UNIQUE NOT NULL,  -- SA-2024-00001
   tracking_token UUID UNIQUE NOT NULL DEFAULT gen_random_uuid(),
 
-  -- Client info (no auth required)
+  -- Client info (no auth required for guests, linked for registered)
   client_name TEXT NOT NULL,
   client_email TEXT NOT NULL,
   client_phone TEXT,
-  client_google_id TEXT,  -- For verified access
+  client_user_id UUID REFERENCES profiles(id),  -- Links to registered client (Epic 8)
+  client_google_id TEXT,  -- For verified access (legacy)
 
   -- Project details
   package_id UUID REFERENCES packages(id),
@@ -311,6 +333,10 @@ CREATE TABLE projects (
   additional_charges DECIMAL(10,2) DEFAULT 0,
   cancellation_reason TEXT,
   cancelled_at TIMESTAMPTZ,
+
+  -- Referral discount (Epic 8)
+  referral_discount_applied DECIMAL(10,2) DEFAULT 0,  -- One-time referral discount
+  reward_balance_applied DECIMAL(10,2) DEFAULT 0,  -- Rewards used on this order
 
   -- Estimated completion (from Stakeholder Mapping - Client need)
   estimated_completion_at TIMESTAMPTZ,
@@ -371,6 +397,111 @@ CREATE TABLE payment_methods (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- =====================================================
+-- EPIC 8: Client Accounts & Referral System Tables
+-- =====================================================
+
+-- Referrals (tracks referral relationships)
+CREATE TABLE referrals (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  referrer_id UUID NOT NULL REFERENCES profiles(id),  -- Who referred
+  referred_id UUID REFERENCES profiles(id),  -- Who was referred (after registration)
+  referred_email TEXT NOT NULL,  -- Email used during signup
+  status TEXT NOT NULL DEFAULT 'signed_up' CHECK (status IN ('signed_up', 'converted')),
+  -- Reward tracking
+  reward_amount DECIMAL(10,2),
+  reward_status TEXT DEFAULT 'pending' CHECK (reward_status IN ('pending', 'available', 'redeemed', 'paid')),
+  converted_at TIMESTAMPTZ,  -- When first project was submitted
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Reward Transactions (audit trail for all reward changes)
+CREATE TABLE reward_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id),
+  type TEXT NOT NULL CHECK (type IN ('referral_reward', 'social_reward', 'redemption', 'payout', 'adjustment')),
+  amount DECIMAL(10,2) NOT NULL,  -- Positive for credits, negative for debits
+  balance_after DECIMAL(10,2) NOT NULL,  -- Running balance
+  reference_id UUID,  -- Links to referral, social_claim, or project
+  reference_type TEXT,  -- 'referral', 'social_claim', 'project', 'payout'
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Payout Requests (cash withdrawal requests)
+CREATE TABLE payout_requests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id),
+  amount DECIMAL(10,2) NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'paid', 'rejected')),
+  payment_method TEXT,  -- GCash, Bank, etc.
+  payment_details JSONB,  -- Account number, name, etc.
+  rejection_reason TEXT,
+  processed_by UUID REFERENCES profiles(id),
+  processed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Social Claims (social media engagement rewards)
+CREATE TABLE social_claims (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id),
+  action_type TEXT NOT NULL CHECK (action_type IN ('like_page', 'follow_page', 'share_post')),
+  social_username TEXT,  -- User's social media handle
+  proof_url TEXT,  -- Screenshot storage path
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'verified', 'rejected')),
+  discount_amount DECIMAL(10,2),  -- Amount earned when verified
+  rejection_reason TEXT,
+  verified_by UUID REFERENCES profiles(id),
+  verified_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  -- Each action type can only be claimed once per user
+  UNIQUE(user_id, action_type)
+);
+
+-- Referral Settings (admin configuration)
+CREATE TABLE referral_settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  program_enabled BOOLEAN DEFAULT true,
+  -- New client discount
+  new_client_discount_type TEXT DEFAULT 'percentage' CHECK (new_client_discount_type IN ('percentage', 'fixed')),
+  new_client_discount_value DECIMAL(10,2) DEFAULT 10,  -- 10% or fixed amount
+  -- Referrer reward
+  referrer_reward_type TEXT DEFAULT 'fixed' CHECK (referrer_reward_type IN ('percentage', 'fixed')),
+  referrer_reward_value DECIMAL(10,2) DEFAULT 100,  -- ₱100 or percentage
+  -- Payout settings
+  minimum_payout DECIMAL(10,2) DEFAULT 500,  -- Minimum to request cash payout
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Social Reward Settings (admin configuration for social actions)
+CREATE TABLE social_reward_settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  action_type TEXT NOT NULL UNIQUE CHECK (action_type IN ('like_page', 'follow_page', 'share_post')),
+  is_enabled BOOLEAN DEFAULT true,
+  discount_amount DECIMAL(10,2) NOT NULL,  -- Amount earned for this action
+  instructions_text TEXT,  -- "Like our Facebook page at..."
+  social_url TEXT,  -- Link to the social page/post
+  display_order INTEGER DEFAULT 0,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- View for referral leaderboard
+CREATE VIEW referral_leaderboard AS
+SELECT
+  p.id,
+  p.full_name,
+  p.referral_code,
+  COUNT(r.id) AS total_referrals,
+  COUNT(r.id) FILTER (WHERE r.status = 'converted') AS conversions,
+  COALESCE(SUM(r.reward_amount) FILTER (WHERE r.reward_status IN ('available', 'redeemed', 'paid')), 0) AS total_earned,
+  COALESCE(SUM(r.reward_amount) FILTER (WHERE r.reward_status = 'available'), 0) AS available_balance
+FROM profiles p
+LEFT JOIN referrals r ON p.id = r.referrer_id
+WHERE p.role = 'client'
+GROUP BY p.id, p.full_name, p.referral_code
+ORDER BY conversions DESC, total_referrals DESC;
 ```
 
 ### Row Level Security Policies
@@ -400,6 +531,15 @@ RETURNS BOOLEAN AS $$
   SELECT EXISTS (
     SELECT 1 FROM profiles
     WHERE id = auth.uid() AND role = 'writer'
+  );
+$$ LANGUAGE SQL SECURITY DEFINER;
+
+-- Helper function to check client role (Epic 8)
+CREATE OR REPLACE FUNCTION is_client()
+RETURNS BOOLEAN AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM profiles
+    WHERE id = auth.uid() AND role = 'client'
   );
 $$ LANGUAGE SQL SECURITY DEFINER;
 
@@ -464,6 +604,73 @@ CREATE POLICY "Public read enabled payment methods" ON payment_methods
 
 CREATE POLICY "Admin manages payment methods" ON payment_methods
   FOR ALL USING (is_admin());
+
+-- =====================================================
+-- EPIC 8: RLS Policies for Client Accounts & Referrals
+-- =====================================================
+
+-- Enable RLS on new tables
+ALTER TABLE referrals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE reward_transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payout_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE social_claims ENABLE ROW LEVEL SECURITY;
+ALTER TABLE referral_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE social_reward_settings ENABLE ROW LEVEL SECURITY;
+
+-- REFERRALS
+CREATE POLICY "Clients view own referrals" ON referrals
+  FOR SELECT USING (referrer_id = auth.uid());
+
+CREATE POLICY "System creates referrals" ON referrals
+  FOR INSERT WITH CHECK (true);  -- Created by system on registration
+
+CREATE POLICY "Admin manages referrals" ON referrals
+  FOR ALL USING (is_admin());
+
+-- REWARD TRANSACTIONS
+CREATE POLICY "Clients view own transactions" ON reward_transactions
+  FOR SELECT USING (user_id = auth.uid());
+
+CREATE POLICY "Admin manages transactions" ON reward_transactions
+  FOR ALL USING (is_admin());
+
+-- PAYOUT REQUESTS
+CREATE POLICY "Clients view own payouts" ON payout_requests
+  FOR SELECT USING (user_id = auth.uid());
+
+CREATE POLICY "Clients create payout requests" ON payout_requests
+  FOR INSERT WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "Admin manages payouts" ON payout_requests
+  FOR ALL USING (is_admin());
+
+-- SOCIAL CLAIMS
+CREATE POLICY "Clients view own claims" ON social_claims
+  FOR SELECT USING (user_id = auth.uid());
+
+CREATE POLICY "Clients create claims" ON social_claims
+  FOR INSERT WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "Admin manages claims" ON social_claims
+  FOR ALL USING (is_admin());
+
+-- REFERRAL SETTINGS (public read, admin write)
+CREATE POLICY "Public read referral settings" ON referral_settings
+  FOR SELECT USING (true);
+
+CREATE POLICY "Admin manages referral settings" ON referral_settings
+  FOR ALL USING (is_admin());
+
+-- SOCIAL REWARD SETTINGS (public read enabled, admin write)
+CREATE POLICY "Public read enabled social settings" ON social_reward_settings
+  FOR SELECT USING (is_enabled = true);
+
+CREATE POLICY "Admin manages social settings" ON social_reward_settings
+  FOR ALL USING (is_admin());
+
+-- PROJECTS: Add client access policy
+CREATE POLICY "Clients view own projects" ON projects
+  FOR SELECT USING (client_user_id = auth.uid());
 ```
 
 ## Implementation Patterns
@@ -993,6 +1200,26 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 **Decision:** pg_cron + Supabase Edge Functions for scheduled tasks
 **Rationale:** No external service needed. pg_cron schedules checks, Edge Functions execute (e.g., deadline warnings, digest emails).
 
+### ADR-018: Client Account System (Epic 8)
+**Decision:** Add client role to Supabase Auth with email/password, extending existing profiles table
+**Rationale:** Reuses existing auth infrastructure. Client role coexists with admin/writer roles. Single profiles table with role-based fields keeps data model simple. Guest tracking (tracking tokens) remains for non-registered users.
+
+### ADR-019: Referral System Design (Epic 8)
+**Decision:** Unique referral codes per client (e.g., DAVE2024) with flexible reward system (discount OR cash payout)
+**Rationale:** Simple, memorable codes are more shareable than long URLs. Dual reward options (apply to order vs cash payout) increase participation. Separate referral_settings table allows admin to adjust program without code changes.
+
+### ADR-020: Unified Reward Balance (Epic 8)
+**Decision:** Single reward_balance column in profiles, combining referral and social rewards
+**Rationale:** Simpler UX - clients see one balance they can use. reward_transactions table provides full audit trail with source type. Avoids complexity of managing multiple separate balances.
+
+### ADR-021: Social Marketing Manual Verification (Epic 8)
+**Decision:** Manual admin verification for social media engagement claims (screenshot + username)
+**Rationale:** Automated verification via social APIs is unreliable and complex. Manual review ensures legitimacy while keeping implementation simple. Admin can process claims in batches during daily operations.
+
+### ADR-022: Referral Code Generation Strategy (Epic 8)
+**Decision:** Generate codes as first 4 letters of name (uppercase) + 4 random digits (e.g., DAVE2024)
+**Rationale:** Memorable, personal codes increase usage. Collision unlikely with 10,000 possible combinations per name prefix. Regenerate on collision. Case-insensitive matching for user convenience.
+
 ---
 
 ## Validation Summary
@@ -1019,5 +1246,6 @@ N/A - All critical decisions made and documented.
 
 _Generated by BMAD Decision Architecture Workflow v1.0_
 _Date: 2024-11-30_
+_Updated: 2025-12-12 (Epic 8: Client Accounts & Referral System)_
 _For: Dave_
 _Elicitation Methods Used: Journey Mapping, First Principles, Pre-mortem Analysis, Devil's Advocate, Stakeholder Mapping_

@@ -1,0 +1,235 @@
+<story-context id="8-1-client-registration" v="1.0">
+  <metadata>
+    <epicId>8</epicId>
+    <storyId>1</storyId>
+    <title>Client Registration</title>
+    <status>drafted</status>
+    <generatedAt>2025-12-12</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/8-1-client-registration.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>visitor</asA>
+    <iWant>to create an account with email and password</iWant>
+    <soThat>I can track all my projects in one place and participate in referral programs</soThat>
+    <tasks>
+      <task id="1" name="Database Migration for Client Registration">
+        <subtask>Create migration file supabase/migrations/00010_client_accounts.sql</subtask>
+        <subtask>Add referral columns to profiles table</subtask>
+        <subtask>Create referrals table</subtask>
+        <subtask>Create referral_settings table</subtask>
+        <subtask>Add RLS policies for client role</subtask>
+        <subtask>Create is_client() helper function</subtask>
+        <subtask>Run migration and regenerate types</subtask>
+      </task>
+      <task id="2" name="Referral Code Utility">
+        <subtask>Create src/lib/utils/referral-code.ts</subtask>
+        <subtask>Implement generateReferralCode function</subtask>
+        <subtask>Add collision detection</subtask>
+        <subtask>Write unit tests</subtask>
+      </task>
+      <task id="3" name="Registration Page UI">
+        <subtask>Create src/app/auth/register/page.tsx</subtask>
+        <subtask>Build form with react-hook-form + zod</subtask>
+        <subtask>Add all required fields</subtask>
+        <subtask>Style with shadcn/ui</subtask>
+        <subtask>Handle ?ref=CODE query param</subtask>
+      </task>
+      <task id="4" name="Registration Server Action">
+        <subtask>Create src/app/auth/register/actions.ts</subtask>
+        <subtask>Implement registerClient() function</subtask>
+        <subtask>Add validation and error handling</subtask>
+        <subtask>Link existing projects by email</subtask>
+      </task>
+      <task id="5" name="Welcome Email Integration">
+        <subtask>Create welcome email template</subtask>
+        <subtask>Trigger after registration</subtask>
+      </task>
+      <task id="6" name="Post-Registration Redirect">
+        <subtask>Update middleware.ts for client role</subtask>
+        <subtask>Add redirect to /client</subtask>
+      </task>
+      <task id="7" name="Testing">
+        <subtask>E2E registration flow</subtask>
+        <subtask>E2E with referral code</subtask>
+        <subtask>Duplicate email handling</subtask>
+        <subtask>RLS policy verification</subtask>
+      </task>
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <criterion id="AC1">Registration form displays correctly with all fields</criterion>
+    <criterion id="AC2">Email validation and duplicate check</criterion>
+    <criterion id="AC3">Password requirements enforced (8+ chars, 1 upper, 1 number)</criterion>
+    <criterion id="AC4">Successful registration creates account with role='client'</criterion>
+    <criterion id="AC5">Unique referral code generated on registration</criterion>
+    <criterion id="AC6">Welcome email sent after registration</criterion>
+    <criterion id="AC7">Referral code validation and linking to referrer</criterion>
+    <criterion id="AC8">Existing projects linked by client_email match</criterion>
+    <criterion id="AC9">Redirect to /client after successful registration</criterion>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>System Architecture</title>
+        <section>Data Architecture - profiles table</section>
+        <snippet>Profiles table includes client role, referral_code, referred_by, referral_discount_used, and reward_balance fields for Epic 8 support.</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>System Architecture</title>
+        <section>Project Structure - auth routes</section>
+        <snippet>Auth routes at src/app/auth/ include login, callback, verify pages. Registration page to be added at src/app/auth/register/.</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>System Architecture</title>
+        <section>Epic 8 RLS Policies</section>
+        <snippet>RLS policies defined for referrals, reward_transactions, payout_requests, social_claims tables with client role access.</snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/tech-spec-epic-8.md</path>
+        <title>Epic 8 Tech Spec</title>
+        <section>Client Registration Flow</section>
+        <snippet>Registration flow: validate form, check email, validate referral code, create auth.user, create profile, generate referral_code, link projects.</snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/tech-spec-epic-8.md</path>
+        <title>Epic 8 Tech Spec</title>
+        <section>Referral Code Generation Strategy</section>
+        <snippet>Code format: First 4 letters of name (uppercase) + 4 random digits (e.g., DAVE2024). Regenerate on collision.</snippet>
+      </doc>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic Breakdown</title>
+        <section>Story 8.1 Acceptance Criteria</section>
+        <snippet>Original story acceptance criteria with Gherkin scenarios for registration, duplicate email handling, and referral code validation.</snippet>
+      </doc>
+      <doc>
+        <path>docs/prd.md</path>
+        <title>Product Requirements</title>
+        <section>FR56-FR61</section>
+        <snippet>Client account functional requirements: registration, login, password reset, unified dashboard, profile management, guest compatibility.</snippet>
+      </doc>
+      <doc>
+        <path>docs/ux-design-specification.md</path>
+        <title>UX Design Specification</title>
+        <section>Form Patterns</section>
+        <snippet>Use react-hook-form with zod validation, shadcn/ui components (Input, Button, Card, Label), Academic Trust theme colors.</snippet>
+      </doc>
+    </docs>
+    <code>
+      <!-- Project is greenfield - no existing source code yet -->
+      <note>Greenfield project: No existing source code. This is the first implementation story for Epic 8.</note>
+      <plannedFile>
+        <path>src/app/auth/register/page.tsx</path>
+        <kind>page</kind>
+        <reason>Main registration page component with form</reason>
+      </plannedFile>
+      <plannedFile>
+        <path>src/app/auth/register/actions.ts</path>
+        <kind>server-action</kind>
+        <reason>Server-side registration logic</reason>
+      </plannedFile>
+      <plannedFile>
+        <path>src/lib/utils/referral-code.ts</path>
+        <kind>utility</kind>
+        <reason>Referral code generation function</reason>
+      </plannedFile>
+      <plannedFile>
+        <path>src/lib/email/templates/welcome-client.tsx</path>
+        <kind>email-template</kind>
+        <reason>Welcome email for new client registrations</reason>
+      </plannedFile>
+      <plannedFile>
+        <path>supabase/migrations/00010_client_accounts.sql</path>
+        <kind>migration</kind>
+        <reason>Database schema for client accounts and referrals</reason>
+      </plannedFile>
+    </code>
+    <dependencies>
+      <node>
+        <package name="@supabase/supabase-js" version="^2.86.0">Supabase client for auth and database</package>
+        <package name="@supabase/ssr" version="^0.8.0">Supabase SSR helpers for Next.js</package>
+        <package name="react-hook-form" version="^7.67.0">Form state management</package>
+        <package name="@hookform/resolvers" version="^5.2.2">Zod resolver for react-hook-form</package>
+        <package name="zod" version="^4.1.13">Schema validation</package>
+        <package name="resend" version="^6.5.2">Email sending service</package>
+        <package name="next" version="14.2.33">Next.js framework</package>
+        <package name="lucide-react" version="^0.555.0">Icons for UI</package>
+      </node>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <constraint type="architecture">Must use Supabase Auth for authentication (ADR-003)</constraint>
+    <constraint type="architecture">Profiles table extends auth.users, role field determines access level</constraint>
+    <constraint type="architecture">RLS policies must be defined for all new tables</constraint>
+    <constraint type="security">Password requirements: 8+ characters, 1 uppercase, 1 number</constraint>
+    <constraint type="security">Referral codes must be case-insensitive for user convenience</constraint>
+    <constraint type="ui">Use shadcn/ui components with Academic Trust theme</constraint>
+    <constraint type="ui">Form validation errors must be clear and actionable</constraint>
+    <constraint type="pattern">Server actions for mutations, not API routes</constraint>
+    <constraint type="pattern">Use react-hook-form with zod for form handling</constraint>
+    <constraint type="email">Welcome email via Resend service (existing integration from Epic 7)</constraint>
+  </constraints>
+
+  <interfaces>
+    <interface>
+      <name>Supabase Auth signUp</name>
+      <kind>SDK method</kind>
+      <signature>supabase.auth.signUp({ email, password, options: { data: { full_name, phone } } })</signature>
+      <path>@supabase/supabase-js</path>
+    </interface>
+    <interface>
+      <name>generateReferralCode</name>
+      <kind>function</kind>
+      <signature>generateReferralCode(fullName: string): string</signature>
+      <path>src/lib/utils/referral-code.ts</path>
+    </interface>
+    <interface>
+      <name>registerClient Server Action</name>
+      <kind>server-action</kind>
+      <signature>registerClient(formData: RegisterClientInput): Promise&lt;RegisterClientResult&gt;</signature>
+      <path>src/app/auth/register/actions.ts</path>
+    </interface>
+    <interface>
+      <name>is_client() SQL function</name>
+      <kind>database-function</kind>
+      <signature>CREATE FUNCTION is_client() RETURNS BOOLEAN</signature>
+      <path>supabase/migrations/00010_client_accounts.sql</path>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>
+      Jest with @testing-library/react for component tests. E2E tests for full registration flows.
+      Unit tests for utility functions (referral-code.ts). Integration tests for server actions.
+      Follow existing test patterns from project structure.
+    </standards>
+    <locations>
+      <location>__tests__/</location>
+      <location>src/**/*.test.ts</location>
+      <location>src/**/*.test.tsx</location>
+      <location>smoke-tests/</location>
+    </locations>
+    <ideas>
+      <idea ac="AC1">Test form renders all required fields correctly</idea>
+      <idea ac="AC2">Test email validation rejects invalid formats</idea>
+      <idea ac="AC2">Test duplicate email returns appropriate error</idea>
+      <idea ac="AC3">Test password validation enforces requirements</idea>
+      <idea ac="AC4">Test successful registration creates user with client role</idea>
+      <idea ac="AC5">Test referral code is generated and unique</idea>
+      <idea ac="AC5">Test referral code collision triggers regeneration</idea>
+      <idea ac="AC6">Test welcome email is triggered on registration</idea>
+      <idea ac="AC7">Test valid referral code creates referral relationship</idea>
+      <idea ac="AC7">Test invalid referral code shows error but allows registration</idea>
+      <idea ac="AC8">Test existing projects are linked by email match</idea>
+      <idea ac="AC9">Test redirect to /client after successful registration</idea>
+    </ideas>
+  </tests>
+</story-context>

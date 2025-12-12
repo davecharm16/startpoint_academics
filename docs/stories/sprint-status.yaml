@@ -1,4 +1,4 @@
-# generated: 2025-11-30
+# generated: 2025-12-12
 # project: startpoint_academics
 # project_key: startpoint-academics
 # tracking_system: file-system
@@ -28,7 +28,7 @@
 # - SM typically drafts next story ONLY after previous one is 'done' to incorporate learnings
 # - Dev moves story to 'review', dev reviews, then Dev moves to 'done'
 
-generated: 2025-11-30
+generated: 2025-12-12
 project: startpoint_academics
 project_key: startpoint-academics
 tracking_system: file-system
@@ -111,3 +111,28 @@ development_status:
   7-7-project-completion-email: done
   7-8-admin-daily-digest: done
   epic-7-retrospective: optional
+
+  # Epic 8: Client Accounts & Referral System (53 points, 21 stories) - NEW
+  epic-8: contexted
+  8-1-client-registration: review
+  8-2-client-login: backlog
+  8-3-client-password-reset: backlog
+  8-4-client-dashboard-layout: backlog
+  8-5-client-projects-dashboard: backlog
+  8-6-guest-tracking-compatibility: backlog
+  8-7-referral-code-generation: backlog
+  8-8-referral-dashboard-for-clients: backlog
+  8-9-referral-code-entry-on-registration: backlog
+  8-10-referral-discount-application: backlog
+  8-11-referrer-reward-tracking: backlog
+  8-12-reward-redemption-options: backlog
+  8-13-admin-referral-settings: backlog
+  8-14-admin-referral-analytics: backlog
+  8-15-admin-payout-processing: backlog
+  8-16-client-profile-management: backlog
+  8-17-social-media-discount-claims: backlog
+  8-18-admin-social-action-configuration: backlog
+  8-19-admin-social-verification-queue: backlog
+  8-20-social-discount-application: backlog
+  8-21-client-social-rewards-dashboard: backlog
+  epic-8-retrospective: optional

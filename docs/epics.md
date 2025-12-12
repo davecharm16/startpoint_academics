@@ -15,6 +15,7 @@ This document provides the complete epic and story breakdown for Startpoint Acad
 - ✅ PRD (55 functional requirements)
 - ✅ UX Design (shadcn/ui, Academic Trust theme, component patterns)
 - ✅ Architecture (Next.js 14 + Supabase + React Hook Form + TanStack Query)
+- ✅ Client Accounts & Referral System (21 new FRs - FR56-FR76) - Added 2025-12-12
 
 ---
 
@@ -91,7 +92,50 @@ This document provides the complete epic and story breakdown for Startpoint Acad
 | FR47 | Automated email alert 48h before deadline if project not "In Progress" | Pre-mortem |
 | FR55 | System sends 7 transactional email types (confirmation, validation, assignment, warning, completion, rejection, digest) | Stakeholder |
 
-**Total: 55 Functional Requirements**
+**Total: 55 Functional Requirements (Original)**
+
+### Client Account Capabilities (NEW)
+| FR | Description | Source |
+|----|-------------|--------|
+| FR56 | Clients can register with email and password | Update Request |
+| FR57 | Clients can log in to access their client dashboard | Update Request |
+| FR58 | Clients can reset their password via email | Update Request |
+| FR59 | Clients can view all their projects in a unified dashboard | Update Request |
+| FR60 | Clients can update their profile information (name, email, phone) | Update Request |
+| FR61 | Existing tracking links continue to work for guest/unregistered access | Update Request |
+
+### Referral System - Client Side (NEW)
+| FR | Description | Source |
+|----|-------------|--------|
+| FR62 | Registered clients automatically receive a unique referral code | Update Request |
+| FR63 | Clients can view their referral dashboard showing successful conversions | Update Request |
+| FR64 | Clients can copy/share their referral link easily | Update Request |
+| FR65 | Clients can see their earned rewards (pending and available) | Update Request |
+| FR66 | Clients can choose reward type: discount on next order OR cash payout | Update Request |
+
+### Referral System - New Client/Registration (NEW)
+| FR | Description | Source |
+|----|-------------|--------|
+| FR67 | New clients can enter a referral code during registration | Update Request |
+| FR68 | Valid referral codes apply discount to first order | Update Request |
+
+### Referral System - Admin (NEW)
+| FR | Description | Source |
+|----|-------------|--------|
+| FR69 | Admin can view referral analytics dashboard (codes, conversions, revenue) | Update Request |
+| FR70 | Admin can configure referral reward settings (discount %, cash value) | Update Request |
+| FR71 | Admin can process/approve cash payouts for referral rewards | Update Request |
+
+### Social Marketing System (NEW)
+| FR | Description | Source |
+|----|-------------|--------|
+| FR72 | Clients can submit claims for social media actions (like page, follow page, share post) | Update Request |
+| FR73 | Admin can configure discount amounts per social action type | Update Request |
+| FR74 | Admin can view and manually verify social media claims | Update Request |
+| FR75 | Verified social discounts are added to client's reward balance | Update Request |
+| FR76 | Clients can see their pending and verified social claims | Update Request |
+
+**Total: 76 Functional Requirements**
 
 ---
 
@@ -106,6 +150,7 @@ This document provides the complete epic and story breakdown for Startpoint Acad
 | **Epic 5** | Client Tracking & Delivery | FR6, FR7, FR8, FR48 | Clients can track and receive work |
 | **Epic 6** | Payments & Reporting | FR18, FR24, FR25, FR26, FR28, FR31, FR54 | Admin can track finances |
 | **Epic 7** | Notifications & Automation | FR30, FR47, FR55 | System sends timely alerts |
+| **Epic 8** | Client Accounts & Referral System | FR56-FR76 | Clients can login, view history, earn referral & social rewards |
 
 **Epic Sequencing Rationale:**
 1. **Foundation** - Must come first (greenfield setup)
@@ -115,6 +160,7 @@ This document provides the complete epic and story breakdown for Startpoint Acad
 5. **Client Tracking** - Clients can see progress (completes the loop)
 6. **Payments & Reporting** - Financial tracking and settlements
 7. **Notifications** - Automated communications (enhancement)
+8. **Client Accounts & Referral** - Growth marketing features (requires core flow complete)
 
 ---
 
@@ -1700,6 +1746,748 @@ Then no email is sent (skip empty digests)
 
 ---
 
+## Epic 8: Client Accounts & Referral System
+
+**Goal:** Enable clients to create accounts, view all their projects in one place, and participate in referral and social marketing programs that reward them for bringing new clients and engaging on social media.
+
+**FRs Covered:** FR56, FR57, FR58, FR59, FR60, FR61, FR62, FR63, FR64, FR65, FR66, FR67, FR68, FR69, FR70, FR71, FR72, FR73, FR74, FR75, FR76
+
+**Dependencies:** Epic 1 (Foundation), Epic 2 (Client Submission), Epic 5 (Tracking), Epic 7 (Notifications)
+
+**User Value:** Clients get a personalized dashboard with project history and can earn rewards by referring friends and engaging on social media. Admin gains marketing channels with trackable ROI.
+
+**Acceptance Criteria:**
+- Clients can register/login with email and password
+- Registered clients see all their projects in one dashboard
+- Each client gets a unique referral code with conversion tracking
+- Social media engagement (like, follow, share) earns discounts
+- Admin can view analytics and configure reward settings
+
+---
+
+### Story 8.1: Client Registration
+
+**As a** visitor
+**I want** to create an account with email and password
+**So that** I can track all my projects in one place
+
+**Acceptance Criteria:**
+```gherkin
+Given I am on the registration page
+When I enter email, password, name, and phone
+Then my account is created
+And I am logged in automatically
+And I receive a welcome email
+
+Given I try to register with an existing email
+When I submit the form
+Then I see an error "Email already registered"
+And I am offered a login link
+
+Given I register successfully
+When my account is created
+Then a unique referral code is generated for me (e.g., CLIENT-XXXX)
+```
+
+**Prerequisites:** Epic 1 (Foundation), Story 7.1 (Email Service)
+
+**Technical Notes:**
+- Create `src/app/auth/register/page.tsx`
+- Extend Supabase Auth for client role
+- Add `role = 'client'` to profiles table
+- Generate referral_code on profile creation (e.g., `CLIENT-${random4chars}`)
+- Create referrals table for tracking
+- Password requirements: 8+ chars, 1 uppercase, 1 number
+
+**Story Points:** 3
+
+---
+
+### Story 8.2: Client Login
+
+**As a** registered client
+**I want** to log in to my account
+**So that** I can access my dashboard
+
+**Acceptance Criteria:**
+```gherkin
+Given I am on the login page
+When I enter valid email and password
+Then I am redirected to /client/dashboard
+
+Given I enter invalid credentials
+When I submit the form
+Then I see an error "Invalid email or password"
+And I can try again
+
+Given I am already logged in
+When I try to access /auth/login
+Then I am redirected to my dashboard
+```
+
+**Prerequisites:** Story 8.1 (Registration)
+
+**Technical Notes:**
+- Update existing login page to handle client role
+- Redirect based on role: admin → /admin, writer → /writer, client → /client
+- Create `src/app/(auth)/client/layout.tsx` for client routes
+- Session persistence with "Remember me" option
+
+**Story Points:** 2
+
+---
+
+### Story 8.3: Client Password Reset
+
+**As a** client
+**I want** to reset my password if I forget it
+**So that** I can regain access to my account
+
+**Acceptance Criteria:**
+```gherkin
+Given I click "Forgot Password" on login page
+When I enter my registered email
+Then I receive a password reset email with a secure link
+
+Given I click the reset link
+When I enter a new password
+Then my password is updated
+And I am redirected to login
+
+Given the reset link is older than 1 hour
+When I try to use it
+Then I see "Link expired" and can request a new one
+```
+
+**Prerequisites:** Story 8.2 (Login), Story 7.1 (Email Service)
+
+**Technical Notes:**
+- Use Supabase Auth password reset flow
+- Create password reset email template
+- Validate password strength on reset
+- Invalidate link after use or expiry
+
+**Story Points:** 2
+
+---
+
+### Story 8.4: Client Dashboard Layout
+
+**As a** logged-in client
+**I want** a dashboard with navigation
+**So that** I can access my projects and referrals
+
+**Acceptance Criteria:**
+```gherkin
+Given I am logged in as a client
+When I view the dashboard
+Then I see navigation: My Projects, Referrals, Social Rewards, Profile
+And I see my name in the header
+And I see a logout option
+
+Given I am on mobile
+When I view the dashboard
+Then navigation is accessible via hamburger menu
+```
+
+**Prerequisites:** Story 8.2 (Login)
+
+**Technical Notes:**
+- Create `src/app/(auth)/client/page.tsx`
+- Create `src/components/layout/client-nav.tsx`
+- Simpler than admin/writer (fewer sections)
+- Apply Academic Trust colors
+- Show referral code prominently (easy to copy)
+
+**Story Points:** 2
+
+---
+
+### Story 8.5: Client Projects Dashboard
+
+**As a** logged-in client
+**I want** to see all my projects in one view
+**So that** I don't need to track separate links
+
+**Acceptance Criteria:**
+```gherkin
+Given I have submitted projects while logged in
+When I visit /client/projects
+Then I see all my projects with status badges
+And I can click any project to see details
+
+Given I submitted a project before registering
+When I link that project to my account (via tracking token)
+Then it appears in my dashboard
+
+Given I have no projects yet
+When I view the dashboard
+Then I see a helpful empty state with "Submit Your First Project" CTA
+```
+
+**Prerequisites:** Story 8.4 (Dashboard Layout)
+
+**Technical Notes:**
+- Query projects where `client_user_id = auth.uid()` OR link via email match
+- Show: reference code, topic, status, deadline, package
+- Sort by created_at DESC (newest first)
+- Add `client_user_id` column to projects table (nullable, for registered clients)
+- Provide way to "claim" past projects by email verification
+
+**Story Points:** 3
+
+---
+
+### Story 8.6: Guest Tracking Compatibility
+
+**As a** non-registered client
+**I want** tracking links to still work
+**So that** I can track projects without creating an account
+
+**Acceptance Criteria:**
+```gherkin
+Given I submitted a project without registering
+When I use my tracking link
+Then I can still view project status (same as before)
+
+Given I am viewing via tracking link
+When I see the tracking page
+Then I see a prompt "Create account to see all your projects"
+
+Given I register after submitting a project
+When I use the same email
+Then my existing project(s) are linked to my account
+```
+
+**Prerequisites:** Epic 5 (Client Tracking)
+
+**Technical Notes:**
+- Keep existing /track/[token] flow unchanged
+- Add "Create Account" CTA on tracking page
+- On registration, query projects by client_email and link to new account
+- Optional: verification step to claim projects
+
+**Story Points:** 2
+
+---
+
+### Story 8.7: Referral Code Generation
+
+**As a** registered client
+**I want** a unique referral code
+**So that** I can share it with friends
+
+**Acceptance Criteria:**
+```gherkin
+Given I register as a client
+When my account is created
+Then a unique referral code is generated (e.g., DAVE2024)
+
+Given I view my referral section
+When the page loads
+Then I see my referral code prominently displayed
+And I see a shareable link (e.g., startpointacademics.com/?ref=DAVE2024)
+And I see a "Copy Link" button
+```
+
+**Prerequisites:** Story 8.1 (Registration)
+
+**Technical Notes:**
+- Add `referral_code` column to profiles (unique, not null for clients)
+- Generate format: first 4 letters of name + random 4 digits (e.g., DAVE2024)
+- Ensure uniqueness, regenerate if collision
+- Store in uppercase for case-insensitive matching
+
+**Story Points:** 2
+
+---
+
+### Story 8.8: Referral Dashboard for Clients
+
+**As a** client with a referral code
+**I want** to see my referral performance
+**So that** I know if my referrals are converting
+
+**Acceptance Criteria:**
+```gherkin
+Given I have shared my referral code
+When I visit /client/referrals
+Then I see total signups using my code
+And I see total conversions (signups who submitted a project)
+And I see my earned rewards (pending and available)
+
+Given someone signed up with my code
+When they submit their first project
+Then my conversion count increases
+And I earn a reward (per admin settings)
+```
+
+**Prerequisites:** Story 8.7 (Referral Code), Story 8.9 (Referral Tracking)
+
+**Technical Notes:**
+- Create referrals table: id, referrer_id, referred_id, referred_email, status (signed_up, converted), reward_status, created_at
+- Create `/client/referrals` page
+- Show: total referred, converted count, pending rewards, available rewards
+- List of referrals with status
+
+**Story Points:** 3
+
+---
+
+### Story 8.9: Referral Code Entry on Registration
+
+**As a** new visitor with a referral code
+**I want** to enter the code when I register
+**So that** I get a discount and my referrer gets credit
+
+**Acceptance Criteria:**
+```gherkin
+Given I land on the site via referral link (?ref=CODE)
+When I go to register
+Then the referral code is pre-filled
+
+Given I enter a valid referral code during registration
+When I complete registration
+Then the referrer is credited
+And I see "You'll get X% off your first order!"
+
+Given I enter an invalid referral code
+When I submit
+Then I see "Invalid referral code" but can still register without it
+```
+
+**Prerequisites:** Story 8.1 (Registration), Story 8.7 (Referral Code)
+
+**Technical Notes:**
+- Add optional `referral_code` field to registration form
+- Validate code exists in profiles table
+- Create referral record on successful registration
+- Store referral relationship for reward tracking
+- Apply discount flag to new user profile
+
+**Story Points:** 3
+
+---
+
+### Story 8.10: Referral Discount Application
+
+**As a** referred client
+**I want** my discount applied to my first order
+**So that** I save money as promised
+
+**Acceptance Criteria:**
+```gherkin
+Given I registered with a valid referral code
+When I submit my first project
+Then the configured discount is applied to my order
+And I see "Referral discount: -X%" on the confirmation
+
+Given I already used my referral discount
+When I submit subsequent projects
+Then no discount is applied (one-time only)
+
+Given the discount brings total below minimum
+When I submit
+Then minimum order amount is enforced
+```
+
+**Prerequisites:** Story 8.9 (Referral Code Entry), Epic 2 (Submission)
+
+**Technical Notes:**
+- Add `referral_discount_used` boolean to profiles
+- Check on submission: if referred AND not used, apply discount
+- Calculate: `final_price = agreed_price * (1 - discount_percentage)`
+- Store original price and discount in project record
+- Mark discount as used after first project
+
+**Story Points:** 3
+
+---
+
+### Story 8.11: Referrer Reward Tracking
+
+**As a** referrer
+**I want** to earn rewards when my referrals convert
+**So that** I'm incentivized to refer more
+
+**Acceptance Criteria:**
+```gherkin
+Given someone I referred submits their first project
+When the project payment is validated
+Then my referral reward becomes "pending"
+And I see it in my referrals dashboard
+
+Given my referral's project is completed
+When admin processes rewards
+Then my reward status changes to "available"
+
+Given I have available rewards
+When I view my dashboard
+Then I see total available reward amount
+```
+
+**Prerequisites:** Story 8.8 (Referral Dashboard), Story 8.10 (Discount Application)
+
+**Technical Notes:**
+- Update referral record status on project submission
+- Calculate reward per admin settings (fixed amount or % of order)
+- Track: reward_amount, reward_status (pending, available, paid)
+- Notify referrer when reward earned (email)
+
+**Story Points:** 3
+
+---
+
+### Story 8.12: Reward Redemption Options
+
+**As a** client with available rewards
+**I want** to choose how to use my rewards
+**So that** I can get a discount or cash
+
+**Acceptance Criteria:**
+```gherkin
+Given I have available rewards
+When I view my referrals page
+Then I see options: "Apply to Next Order" or "Request Cash Payout"
+
+Given I choose "Apply to Next Order"
+When I submit my next project
+Then my reward balance is applied as a discount
+And my reward balance decreases accordingly
+
+Given I choose "Request Cash Payout"
+When I submit the request
+Then admin receives a payout request notification
+And my reward status changes to "payout_requested"
+```
+
+**Prerequisites:** Story 8.11 (Reward Tracking)
+
+**Technical Notes:**
+- Add reward_balance to profiles (decimal)
+- Create reward_transactions table for audit trail
+- Apply reward as discount on checkout
+- Create payout_requests table for cash requests
+- Minimum payout threshold (configurable by admin)
+
+**Story Points:** 3
+
+---
+
+### Story 8.13: Admin Referral Settings
+
+**As an** admin
+**I want** to configure referral program settings
+**So that** I can control rewards and discounts
+
+**Acceptance Criteria:**
+```gherkin
+Given I visit /admin/settings
+When I view referral settings
+Then I see: new client discount %, referrer reward amount, minimum payout
+
+Given I change the new client discount to 15%
+When I save
+Then new referrals get 15% off first order
+
+Given I set referrer reward to ₱100 per conversion
+When a referral converts
+Then the referrer earns ₱100
+```
+
+**Prerequisites:** Story 3.9 (Payment Settings)
+
+**Technical Notes:**
+- Add to payment_settings or create referral_settings table
+- Fields: new_client_discount_percentage, referrer_reward_type (fixed/percentage), referrer_reward_value, minimum_payout, program_enabled
+- Changes apply to new referrals only
+
+**Story Points:** 2
+
+---
+
+### Story 8.14: Admin Referral Analytics
+
+**As an** admin
+**I want** to view referral program performance
+**So that** I can measure marketing ROI
+
+**Acceptance Criteria:**
+```gherkin
+Given I visit /admin/referrals
+When the page loads
+Then I see: total referrals, conversion rate, total rewards paid, revenue from referrals
+
+Given I want to see top performers
+When I view the leaderboard
+Then I see top referrers by: signups, conversions, revenue generated
+
+Given I want details on a specific code
+When I click a referrer
+Then I see all their referrals with status and reward info
+```
+
+**Prerequisites:** Story 8.11 (Reward Tracking)
+
+**Technical Notes:**
+- Create `/admin/referrals` page
+- Aggregate queries on referrals table
+- Show: total_signups, total_conversions, conversion_rate, total_rewards_paid
+- Leaderboard: GROUP BY referrer_id with counts
+- Filter by date range
+
+**Story Points:** 3
+
+---
+
+### Story 8.15: Admin Payout Processing
+
+**As an** admin
+**I want** to process cash payout requests
+**So that** referrers receive their rewards
+
+**Acceptance Criteria:**
+```gherkin
+Given referrers have requested payouts
+When I visit /admin/referrals/payouts
+Then I see pending payout requests with amounts
+
+Given I process a payout
+When I mark it as paid
+Then the referrer's reward balance decreases
+And they receive an email confirmation
+And an audit record is created
+
+Given I need to reject a payout
+When I reject with a reason
+Then the referrer is notified
+And funds return to available balance
+```
+
+**Prerequisites:** Story 8.12 (Reward Redemption), Story 8.14 (Analytics)
+
+**Technical Notes:**
+- Create payout processing UI
+- Track: payout_id, user_id, amount, status (pending, paid, rejected), processed_by, processed_at
+- Email notification on payout completion
+- Audit trail for compliance
+
+**Story Points:** 3
+
+---
+
+### Story 8.16: Client Profile Management
+
+**As a** registered client
+**I want** to update my profile information
+**So that** my details are current
+
+**Acceptance Criteria:**
+```gherkin
+Given I visit /client/profile
+When I update my name or phone
+Then my profile is updated
+And I see a success confirmation
+
+Given I want to change my email
+When I enter a new email
+Then I must verify the new email before it's changed
+
+Given I want to change my password
+When I enter current password and new password
+Then my password is updated
+```
+
+**Prerequisites:** Story 8.4 (Dashboard Layout)
+
+**Technical Notes:**
+- Create `/client/profile` page
+- Profile update form with validation
+- Email change requires verification (Supabase flow)
+- Password change requires current password
+
+**Story Points:** 2
+
+---
+
+### Story 8.17: Social Media Discount Claims
+
+**As a** registered client
+**I want** to claim discounts for social media engagement
+**So that** I can save money on my orders
+
+**Acceptance Criteria:**
+```gherkin
+Given I am logged in as a client
+When I visit /client/social-rewards
+Then I see available social actions: Like Page, Follow Page, Share Post
+And I see the discount value for each action
+
+Given I liked the Facebook page
+When I click "Claim Reward" for "Like Page"
+Then I am prompted to enter my social media username/profile link
+And I can upload a screenshot as proof
+And my claim is submitted for verification
+
+Given I already claimed "Like Page" reward
+When I view that action
+Then I see "Pending Verification" or "Verified" status
+And I cannot claim it again
+```
+
+**Prerequisites:** Story 8.4 (Client Dashboard)
+
+**Technical Notes:**
+- Create social_claims table: id, user_id, action_type (like, follow, share), proof_url, social_username, status (pending, verified, rejected), verified_by, verified_at, discount_amount, created_at
+- Action types: 'like_page', 'follow_page', 'share_post'
+- Each action claimable once per client
+- Store screenshot in Supabase Storage (social-proofs bucket)
+
+**Story Points:** 3
+
+---
+
+### Story 8.18: Admin Social Action Configuration
+
+**As an** admin
+**I want** to configure social media reward amounts
+**So that** I can control marketing spend
+
+**Acceptance Criteria:**
+```gherkin
+Given I visit /admin/settings
+When I view social rewards settings
+Then I see configurable discounts for: Like Page, Follow Page, Share Post
+
+Given I set "Like Page" discount to ₱50
+When I save
+Then new verified claims earn ₱50
+
+Given I want to disable a social action
+When I toggle it off
+Then clients no longer see that option
+```
+
+**Prerequisites:** Story 3.9 (Admin Settings)
+
+**Technical Notes:**
+- Create social_reward_settings table or add to existing settings
+- Fields per action: action_type, discount_amount, is_enabled, instructions_text
+- Add social media page URLs for reference (Facebook page link, etc.)
+- Instructions text shown to clients (e.g., "Like our Facebook page at...")
+
+**Story Points:** 2
+
+---
+
+### Story 8.19: Admin Social Verification Queue
+
+**As an** admin
+**I want** to verify social media claims manually
+**So that** only legitimate claims get rewards
+
+**Acceptance Criteria:**
+```gherkin
+Given clients have submitted social claims
+When I visit /admin/social-claims
+Then I see pending claims with: client name, action type, screenshot, social username
+
+Given I review a claim
+When I click on it
+Then I see the screenshot proof
+And I see a link to verify on the actual social platform
+And I see "Verify" and "Reject" buttons
+
+Given I verify a claim
+When I click "Verify"
+Then the discount is added to the client's reward balance
+And the client is notified
+
+Given I reject a claim
+When I enter a reason and click "Reject"
+Then the client is notified with the reason
+And they can resubmit with better proof
+```
+
+**Prerequisites:** Story 8.17 (Social Claims)
+
+**Technical Notes:**
+- Create `/admin/social-claims` page
+- Filter by status: pending, verified, rejected
+- Display screenshot from storage
+- On verify: update status, add to user's reward_balance
+- On reject: update status, store rejection_reason, allow resubmission
+
+**Story Points:** 3
+
+---
+
+### Story 8.20: Social Discount Application
+
+**As a** client with verified social rewards
+**I want** my social discounts added to my balance
+**So that** I can use them on orders
+
+**Acceptance Criteria:**
+```gherkin
+Given my social claim was verified
+When I view my rewards dashboard
+Then I see the social discount added to my available balance
+
+Given I have ₱150 from social rewards
+When I submit a project
+Then I can apply my balance as a discount
+
+Given social rewards and referral rewards both exist
+When I view my balance
+Then I see a combined total available
+```
+
+**Prerequisites:** Story 8.19 (Verification), Story 8.12 (Reward Redemption)
+
+**Technical Notes:**
+- Social rewards add to same reward_balance as referral rewards
+- Create reward_transactions entry with type='social_reward'
+- Unified balance for all reward types
+- Transaction history shows source of each reward
+
+**Story Points:** 2
+
+---
+
+### Story 8.21: Client Social Rewards Dashboard
+
+**As a** client
+**I want** to see my social engagement status
+**So that** I know which rewards I've claimed
+
+**Acceptance Criteria:**
+```gherkin
+Given I visit /client/social-rewards
+When the page loads
+Then I see all social actions with their status:
+  - Available (not claimed yet) with "Claim" button
+  - Pending (awaiting verification)
+  - Verified (reward added) with earned amount
+  - Rejected (can resubmit)
+
+Given I have verified social rewards
+When I view the summary
+Then I see total earned from social actions
+```
+
+**Prerequisites:** Story 8.17 (Social Claims)
+
+**Technical Notes:**
+- Create dedicated social rewards section
+- Show each action type with status badge
+- Display instructions for each action (e.g., "Follow us at @startpointacademics")
+- Progress indicator: "2 of 3 social rewards claimed"
+
+**Story Points:** 2
+
+---
+
 ## Story Summary
 
 | Epic | Stories | Total Points |
@@ -1711,7 +2499,8 @@ Then no email is sent (skip empty digests)
 | Epic 5: Client Tracking & Delivery | 5 | 17 |
 | Epic 6: Payments & Reporting | 5 | 13 |
 | Epic 7: Notifications & Automation | 8 | 23 |
-| **TOTAL** | **49 stories** | **160 points** |
+| Epic 8: Client Accounts & Referral System | 21 | 53 |
+| **TOTAL** | **70 stories** | **213 points** |
 
 ---
 
@@ -1727,8 +2516,13 @@ Then no email is sent (skip empty digests)
 6. **Sprint 6:** Epic 5 (Tracking) - All 5 stories
 7. **Sprint 7:** Epic 6 (Payments & Reporting) - All 5 stories
 8. **Sprint 8:** Epic 7 (Notifications) - All 8 stories
+9. **Sprint 9:** Epic 8.1-8.6 (Client Accounts) - Registration, login, dashboard
+10. **Sprint 10:** Epic 8.7-8.16 (Referral System) - Codes, tracking, rewards
+11. **Sprint 11:** Epic 8.17-8.21 (Social Marketing) - Claims, verification, rewards
 
 **MVP Critical Path:** Epics 1-5 enable end-to-end flow from submission to delivery.
 
-**Post-MVP:** Epic 6 and Epic 7 enhance operations but aren't blocking for first users.
+**Post-MVP Enhancements:**
+- Epic 6 and Epic 7: Operations and notifications
+- Epic 8: Growth marketing features (client accounts, referrals, social rewards)
 
