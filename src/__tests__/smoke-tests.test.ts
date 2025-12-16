@@ -236,7 +236,7 @@ describe('Epic 7: Notifications & Automation', () => {
 describe('Database Connectivity', () => {
   it('should have Supabase environment variables', () => {
     const hasSupabaseUrl = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const hasSupabaseKey = !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const hasSupabaseKey = !!process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
     // These should be set in .env.local
     expect(hasSupabaseUrl || true).toBe(true); // Soft check
     expect(hasSupabaseKey || true).toBe(true); // Soft check

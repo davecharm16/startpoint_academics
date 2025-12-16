@@ -17,7 +17,7 @@ export async function generateStaticParams() {
   // Use direct client for build-time static generation
   const supabase = createBuildClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
   );
 
   const { data: packages } = await supabase
