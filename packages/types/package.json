@@ -1,0 +1,26 @@
+{
+  "name": "@startpoint/types",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./database": {
+      "import": "./dist/database.js",
+      "types": "./dist/database.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "lint": "echo 'No lint configured'"
+  },
+  "devDependencies": {
+    "@startpoint/config": "workspace:*",
+    "typescript": "^5"
+  }
+}

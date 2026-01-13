@@ -1,0 +1,17 @@
+{
+  "name": "@startpoint/config",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./tailwind": "./tailwind/tailwind.config.ts",
+    "./tsconfig/base": "./tsconfig/base.json",
+    "./tsconfig/nextjs": "./tsconfig/nextjs.json",
+    "./tsconfig/react-library": "./tsconfig/react-library.json"
+  },
+  "devDependencies": {
+    "eslint": "^8",
+    "eslint-config-next": "14.2.33",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}

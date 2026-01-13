@@ -1,0 +1,33 @@
+{
+  "name": "@startpoint/utils",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./reference-code": {
+      "import": "./dist/reference-code.js",
+      "types": "./dist/reference-code.d.ts"
+    },
+    "./referral-code": {
+      "import": "./dist/referral-code.js",
+      "types": "./dist/referral-code.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "lint": "echo 'No lint configured'"
+  },
+  "dependencies": {
+    "@startpoint/supabase": "workspace:*"
+  },
+  "devDependencies": {
+    "@startpoint/config": "workspace:*",
+    "typescript": "^5"
+  }
+}

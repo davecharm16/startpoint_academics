@@ -1,0 +1,35 @@
+{
+  "name": "@startpoint/email",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./templates": {
+      "import": "./dist/templates/index.js",
+      "types": "./dist/templates/index.d.ts"
+    },
+    "./notifications": {
+      "import": "./dist/notifications.js",
+      "types": "./dist/notifications.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "lint": "echo 'No lint configured'"
+  },
+  "dependencies": {
+    "resend": "^6.5.2",
+    "date-fns": "^4.1.0"
+  },
+  "devDependencies": {
+    "@startpoint/config": "workspace:*",
+    "@types/node": "^20",
+    "typescript": "^5"
+  }
+}

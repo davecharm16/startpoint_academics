@@ -1,0 +1,48 @@
+{
+  "name": "@startpoint/supabase",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./admin": {
+      "import": "./dist/admin.js",
+      "types": "./dist/admin.d.ts"
+    },
+    "./client": {
+      "import": "./dist/client.js",
+      "types": "./dist/client.d.ts"
+    },
+    "./server": {
+      "import": "./dist/server.js",
+      "types": "./dist/server.d.ts"
+    },
+    "./middleware": {
+      "import": "./dist/middleware.js",
+      "types": "./dist/middleware.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "lint": "echo 'No lint configured'"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.86.0",
+    "@startpoint/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@startpoint/config": "workspace:*",
+    "@types/node": "^20",
+    "next": "14.2.33",
+    "typescript": "^5"
+  },
+  "peerDependencies": {
+    "next": "^14"
+  }
+}
