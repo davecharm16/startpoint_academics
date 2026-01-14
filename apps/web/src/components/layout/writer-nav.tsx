@@ -13,11 +13,12 @@ import {
   DropdownMenuTrigger,
 } from "@startpoint/ui";
 import { Sheet, SheetContent, SheetTrigger } from "@startpoint/ui";
-import { FileText, DollarSign, Menu, User, LogOut } from "lucide-react";
+import { FileText, DollarSign, Menu, User, LogOut, Bot } from "lucide-react";
 import { useState } from "react";
 
 const NAV_ITEMS = [
   { href: "/writer", label: "My Projects", icon: FileText },
+  { href: "/writer/agent", label: "Writing Assistant", icon: Bot },
   { href: "/writer/earnings", label: "Earnings", icon: DollarSign },
 ];
 
@@ -44,6 +45,9 @@ export function WriterNav({ user }: WriterNavProps) {
   const isActive = (href: string) => {
     if (href === "/writer") {
       return pathname === "/writer" || pathname.startsWith("/writer/projects");
+    }
+    if (href === "/writer/agent") {
+      return pathname.startsWith("/writer/agent");
     }
     return pathname.startsWith(href);
   };

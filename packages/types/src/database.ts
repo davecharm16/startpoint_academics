@@ -448,6 +448,267 @@ export interface Database {
           updated_at?: string;
         };
       };
+      // Agent System Tables
+      agent_usage_limits: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          daily_token_limit: number;
+          weekly_token_limit: number;
+          session_token_limit: number;
+          is_default: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          description?: string | null;
+          daily_token_limit?: number;
+          weekly_token_limit?: number;
+          session_token_limit?: number;
+          is_default?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          description?: string | null;
+          daily_token_limit?: number;
+          weekly_token_limit?: number;
+          session_token_limit?: number;
+          is_default?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      writer_agent_sessions: {
+        Row: {
+          id: string;
+          writer_id: string;
+          project_id: string;
+          title: string | null;
+          status: "active" | "closed" | "archived";
+          total_input_tokens: number;
+          total_output_tokens: number;
+          message_count: number;
+          created_at: string;
+          updated_at: string;
+          closed_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          writer_id: string;
+          project_id: string;
+          title?: string | null;
+          status?: "active" | "closed" | "archived";
+          total_input_tokens?: number;
+          total_output_tokens?: number;
+          message_count?: number;
+          created_at?: string;
+          updated_at?: string;
+          closed_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          writer_id?: string;
+          project_id?: string;
+          title?: string | null;
+          status?: "active" | "closed" | "archived";
+          total_input_tokens?: number;
+          total_output_tokens?: number;
+          message_count?: number;
+          created_at?: string;
+          updated_at?: string;
+          closed_at?: string | null;
+        };
+      };
+      agent_messages: {
+        Row: {
+          id: string;
+          session_id: string;
+          role: "user" | "assistant" | "system" | "tool";
+          content: string | null;
+          tool_name: string | null;
+          tool_input: Json | null;
+          tool_result: Json | null;
+          input_tokens: number;
+          output_tokens: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          session_id: string;
+          role: "user" | "assistant" | "system" | "tool";
+          content?: string | null;
+          tool_name?: string | null;
+          tool_input?: Json | null;
+          tool_result?: Json | null;
+          input_tokens?: number;
+          output_tokens?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          session_id?: string;
+          role?: "user" | "assistant" | "system" | "tool";
+          content?: string | null;
+          tool_name?: string | null;
+          tool_input?: Json | null;
+          tool_result?: Json | null;
+          input_tokens?: number;
+          output_tokens?: number;
+          created_at?: string;
+        };
+      };
+      agent_drafts: {
+        Row: {
+          id: string;
+          session_id: string | null;
+          project_id: string;
+          writer_id: string;
+          title: string;
+          content: Json;
+          plain_text: string | null;
+          word_count: number;
+          is_exported: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          session_id?: string | null;
+          project_id: string;
+          writer_id: string;
+          title?: string;
+          content?: Json;
+          plain_text?: string | null;
+          word_count?: number;
+          is_exported?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          session_id?: string | null;
+          project_id?: string;
+          writer_id?: string;
+          title?: string;
+          content?: Json;
+          plain_text?: string | null;
+          word_count?: number;
+          is_exported?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      writer_usage_daily: {
+        Row: {
+          writer_id: string;
+          date: string;
+          total_tokens: number;
+          input_tokens: number;
+          output_tokens: number;
+          session_count: number;
+          message_count: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          writer_id: string;
+          date: string;
+          total_tokens?: number;
+          input_tokens?: number;
+          output_tokens?: number;
+          session_count?: number;
+          message_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          writer_id?: string;
+          date?: string;
+          total_tokens?: number;
+          input_tokens?: number;
+          output_tokens?: number;
+          session_count?: number;
+          message_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      agent_blocked_attempts: {
+        Row: {
+          id: string;
+          writer_id: string | null;
+          session_id: string | null;
+          reason: string;
+          category: "usage_limit" | "content_filter" | "project_invalid" | "other" | null;
+          message_snippet: string | null;
+          metadata: Json | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          writer_id?: string | null;
+          session_id?: string | null;
+          reason: string;
+          category?: "usage_limit" | "content_filter" | "project_invalid" | "other" | null;
+          message_snippet?: string | null;
+          metadata?: Json | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          writer_id?: string | null;
+          session_id?: string | null;
+          reason?: string;
+          category?: "usage_limit" | "content_filter" | "project_invalid" | "other" | null;
+          message_snippet?: string | null;
+          metadata?: Json | null;
+          created_at?: string;
+        };
+      };
+      agent_uploads: {
+        Row: {
+          id: string;
+          session_id: string;
+          writer_id: string;
+          file_name: string;
+          file_type: string;
+          file_size: number;
+          storage_path: string;
+          extracted_text: string | null;
+          is_processed: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          session_id: string;
+          writer_id: string;
+          file_name: string;
+          file_type: string;
+          file_size: number;
+          storage_path: string;
+          extracted_text?: string | null;
+          is_processed?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          session_id?: string;
+          writer_id?: string;
+          file_name?: string;
+          file_type?: string;
+          file_size?: number;
+          storage_path?: string;
+          extracted_text?: string | null;
+          is_processed?: boolean;
+          created_at?: string;
+        };
+      };
     };
     Views: {
       writer_workload: {
@@ -509,3 +770,12 @@ export type PaymentMethod = Database["public"]["Tables"]["payment_methods"]["Row
 export type Referral = Database["public"]["Tables"]["referrals"]["Row"];
 export type RewardTransaction = Database["public"]["Tables"]["reward_transactions"]["Row"];
 export type ReferralSettings = Database["public"]["Tables"]["referral_settings"]["Row"];
+
+// Agent System Types
+export type AgentUsageLimit = Database["public"]["Tables"]["agent_usage_limits"]["Row"];
+export type WriterAgentSession = Database["public"]["Tables"]["writer_agent_sessions"]["Row"];
+export type AgentMessage = Database["public"]["Tables"]["agent_messages"]["Row"];
+export type AgentDraft = Database["public"]["Tables"]["agent_drafts"]["Row"];
+export type WriterUsageDaily = Database["public"]["Tables"]["writer_usage_daily"]["Row"];
+export type AgentBlockedAttempt = Database["public"]["Tables"]["agent_blocked_attempts"]["Row"];
+export type AgentUpload = Database["public"]["Tables"]["agent_uploads"]["Row"];
