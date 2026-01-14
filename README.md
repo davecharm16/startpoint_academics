@@ -86,32 +86,73 @@ pnpm add @startpoint/ui --filter @startpoint/web
 
 ## Phone Development
 
-For development on mobile devices or remote access:
+For coding from your phone using Claude Code and GitHub:
+
+### Claude Code + GitHub (Recommended)
+
+The easiest way to code from your phone is using Claude Code via the web:
+
+1. **Open Claude** at [claude.ai](https://claude.ai) on your phone browser
+2. **Start a conversation** and describe what you want to build/fix
+3. **Share code context** by:
+   - Pasting file contents from GitHub mobile app
+   - Describing the file structure
+   - Sharing error messages
+4. **Get code from Claude** and commit via GitHub:
+   - Copy Claude's code output
+   - Open [github.com](https://github.com) on mobile
+   - Navigate to the file → Edit (pencil icon)
+   - Paste the code and commit
+
+### GitHub Mobile Workflow
+
+```
+Phone workflow:
+1. GitHub mobile app → View files, issues, PRs
+2. Claude (web) → Generate/fix code
+3. GitHub web (mobile browser) → Edit files directly
+4. Commit → Vercel auto-deploys
+```
+
+**Quick edits on GitHub mobile:**
+- Go to your repo → Find file → Tap "..." → "Edit file"
+- Make changes → Scroll down → Add commit message → Commit
 
 ### Using VS Code Remote Tunnels
 
-1. Install the `code` CLI: `code tunnel`
-2. Start tunnel: `code tunnel --accept-server-license-terms`
-3. Access via https://vscode.dev and sign in with GitHub
+For a full IDE experience from phone:
 
-### Using ngrok (for local testing)
+1. **On your computer**, start a tunnel:
+   ```bash
+   code tunnel --accept-server-license-terms
+   ```
+2. **On your phone**, go to [vscode.dev](https://vscode.dev)
+3. Sign in with GitHub and connect to your tunnel
+4. Full VS Code experience in your browser
+
+### Using Codespaces
+
+GitHub Codespaces gives you a full dev environment in the cloud:
+
+1. Go to your repo on GitHub
+2. Click "Code" → "Codespaces" → "Create codespace"
+3. Wait for it to spin up (has Node, pnpm, etc.)
+4. Run `pnpm install && pnpm dev`
+5. Codespaces auto-forwards port 3000
+
+### Local Testing with ngrok
+
+If you need to test the running app on your phone:
 
 ```bash
-# Install ngrok
-npm install -g ngrok
-
-# Start Next.js dev server
+# On your computer - start dev server
 pnpm dev
 
-# In another terminal, expose port 3000
-ngrok http 3000
+# In another terminal - expose to internet
+npx ngrok http 3000
 ```
 
-### Using Tailscale (private network)
-
-1. Install Tailscale on both devices
-2. Run `pnpm dev --hostname 0.0.0.0`
-3. Access via Tailscale IP: `http://<tailscale-ip>:3000`
+Then open the ngrok URL on your phone to test.
 
 ## Features
 
