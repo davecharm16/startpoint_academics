@@ -1,6 +1,4 @@
 {
-  "buildCommand": "cd ../.. && pnpm turbo build --filter=@startpoint/web",
-  "installCommand": "cd ../.. && pnpm install",
   "crons": [
     {
       "path": "/api/cron/deadline-warnings",
