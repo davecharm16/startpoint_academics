@@ -1,7 +1,7 @@
 import { createClient } from "@startpoint/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@startpoint/ui";
-import { CopyButton } from "@startpoint/ui";
 import { FolderOpen, Gift, Coins } from "lucide-react";
+import { ReferralCodeCard } from "@/components/client/referral-code-card";
 
 export default async function ClientDashboard() {
   const supabase = await createClient();
@@ -39,6 +39,19 @@ export default async function ClientDashboard() {
     .select("*", { count: "exact", head: true })
     .eq("referrer_id", user.id);
 
+  // Fetch referral settings for discount/reward display
+  const { data: settingsData } = await supabase
+    .from("referral_settings" as "profiles")
+    .select("*")
+    .single();
+
+  const referralSettings = settingsData as {
+    new_client_discount_type: "percentage" | "fixed";
+    new_client_discount_value: number;
+    referrer_reward_type: "percentage" | "fixed";
+    referrer_reward_value: number;
+  } | null;
+
   const rewardBalance = Number(profileData?.reward_balance || 0);
   const referralCode = profileData?.referral_code || null;
 
@@ -61,6 +74,17 @@ export default async function ClientDashboard() {
           Here&apos;s an overview of your account.
         </p>
       </div>
+
+      {/* Referral Code Section */}
+      {referralCode && referralSettings && (
+        <ReferralCodeCard
+          referralCode={referralCode}
+          discountType={referralSettings.new_client_discount_type}
+          discountValue={referralSettings.new_client_discount_value}
+          rewardType={referralSettings.referrer_reward_type}
+          rewardValue={referralSettings.referrer_reward_value}
+        />
+      )}
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-3">
@@ -111,34 +135,6 @@ export default async function ClientDashboard() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Referral Code Section */}
-      {referralCode && (
-        <Card>
-          <CardContent className="py-6">
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <div className="flex-1 text-center sm:text-left">
-                <h3 className="text-lg font-semibold">
-                  Share your referral code
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Earn rewards when friends sign up and submit projects using
-                  your code!
-                </p>
-              </div>
-              <div className="flex items-center gap-2 rounded-lg bg-primary/5 px-4 py-3">
-                <span className="font-mono text-2xl font-bold tracking-widest text-primary">
-                  {referralCode}
-                </span>
-                <CopyButton
-                  value={referralCode}
-                  label="Copy referral code"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

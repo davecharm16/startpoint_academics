@@ -27,6 +27,7 @@ export interface RegisterResult {
   hasReferralDiscount?: boolean;
   error?: string;
   fieldErrors?: Record<string, string>;
+  fieldWarnings?: Record<string, string>;
 }
 
 export async function registerClient(data: RegisterInput): Promise<RegisterResult> {
@@ -64,6 +65,7 @@ export async function registerClient(data: RegisterInput): Promise<RegisterResul
 
     // Validate referral code if provided
     let referrerId: string | null = null;
+    let referralWarning: string | null = null;
     if (referralCode) {
       const normalizedCode = normalizeReferralCode(referralCode);
       const { data: referrer } = await supabase
@@ -74,13 +76,13 @@ export async function registerClient(data: RegisterInput): Promise<RegisterResul
 
       const referrerData = referrer as { id: string; referral_code: string } | null;
       if (!referrerData) {
-        return {
-          success: false,
-          error: "Invalid referral code",
-          fieldErrors: { referralCode: "This referral code is not valid" },
-        };
+        // Invalid referral code should NOT block registration (AC 4)
+        // Set referrerId to null and continue with a warning
+        referrerId = null;
+        referralWarning = "This referral code is not valid. Registration will continue without a referral.";
+      } else {
+        referrerId = referrerData.id;
       }
-      referrerId = referrerData.id;
     }
 
     // Get existing referral codes for collision checking
@@ -161,6 +163,9 @@ export async function registerClient(data: RegisterInput): Promise<RegisterResul
       userId: authData.user.id,
       referralCode: newReferralCode,
       hasReferralDiscount: !!referrerId,
+      ...(referralWarning
+        ? { fieldWarnings: { referralCode: referralWarning } }
+        : {}),
     };
   } catch (error) {
     console.error("Registration error:", error);

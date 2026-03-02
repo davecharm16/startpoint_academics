@@ -191,6 +191,127 @@ export async function POST(request: NextRequest) {
       console.error("Failed to send submission confirmation email:", err);
     });
 
+    // === REFERRAL DISCOUNT APPLICATION ===
+    // Check if the submitting client has a referral that hasn't used their discount
+    // We look up by email since the API accepts unauthenticated submissions
+    const clientEmail = data.client_email.toLowerCase();
+
+    // Look up if this email belongs to a referred client who hasn't used their discount
+    const { data: clientProfile } = await supabase
+      .from("profiles")
+      .select("id, referred_by, referral_discount_used, reward_balance")
+      .eq("email", clientEmail)
+      .single();
+
+    const client = clientProfile as {
+      id: string;
+      referred_by: string | null;
+      referral_discount_used: boolean;
+      reward_balance: number;
+    } | null;
+
+    if (client && client.referred_by && !client.referral_discount_used) {
+      // Fetch referral settings
+      const { data: settingsData } = await supabase
+        .from("referral_settings" as "profiles")
+        .select("*")
+        .single();
+
+      const settings = settingsData as {
+        new_client_discount_type: "percentage" | "fixed";
+        new_client_discount_value: number;
+        referrer_reward_type: "percentage" | "fixed";
+        referrer_reward_value: number;
+      } | null;
+
+      if (settings) {
+        const { calculateReferralDiscount, calculateReferrerReward } =
+          await import("@/lib/referral-engine");
+
+        const discountAmount = calculateReferralDiscount(
+          Number(data.agreed_price),
+          settings
+        );
+        const rewardAmount = calculateReferrerReward(
+          Number(data.agreed_price),
+          settings
+        );
+
+        if (discountAmount > 0) {
+          // Apply discount to project
+          await (
+            supabase.from("projects") as ReturnType<typeof supabase.from>
+          )
+            .update({ referral_discount_applied: discountAmount } as never)
+            .eq("id", projectResult.id);
+
+          // Mark discount as used
+          await (
+            supabase.from("profiles") as ReturnType<typeof supabase.from>
+          )
+            .update({ referral_discount_used: true } as never)
+            .eq("id", client.id);
+        }
+
+        // Update referral status to converted
+        await (
+          supabase.from("referrals" as "profiles") as ReturnType<
+            typeof supabase.from
+          >
+        )
+          .update({
+            status: "converted",
+            converted_at: new Date().toISOString(),
+            reward_amount: rewardAmount,
+            reward_status: "pending",
+          } as never)
+          .eq("referred_id", client.id)
+          .eq("status", "signed_up");
+
+        // Create pending reward transaction for referrer
+        if (rewardAmount > 0) {
+          await (
+            supabase.from("reward_transactions" as "profiles") as ReturnType<
+              typeof supabase.from
+            >
+          ).insert({
+            user_id: client.referred_by,
+            type: "referral_reward",
+            amount: rewardAmount,
+            balance_after: 0, // Will be updated when reward becomes available
+            reference_id: projectResult.id,
+            reference_type: "project",
+            notes: `Referral reward for project ${referenceCode} (pending until project completion)`,
+          } as never);
+        }
+
+        // Link project to client
+        await (
+          supabase.from("projects") as ReturnType<typeof supabase.from>
+        )
+          .update({ client_user_id: client.id } as never)
+          .eq("id", projectResult.id);
+
+        // Add discount info to response
+        return NextResponse.json({
+          success: true,
+          reference_code: referenceCode,
+          tracking_token: trackingToken,
+          project_id: projectResult.id,
+          referral_discount_applied: discountAmount,
+        });
+      }
+    }
+
+    // Also link project to client even without referral discount
+    if (client) {
+      await (
+        supabase.from("projects") as ReturnType<typeof supabase.from>
+      )
+        .update({ client_user_id: client.id } as never)
+        .eq("id", projectResult.id);
+    }
+
     return NextResponse.json({
       success: true,
       reference_code: referenceCode,

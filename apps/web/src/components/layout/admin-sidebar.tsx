@@ -12,6 +12,7 @@ import {
   Users,
   Package,
   CreditCard,
+  Gift,
   Settings,
   LogOut,
   Menu,
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
   { href: "/admin/writers", label: "Writers", icon: Users },
   { href: "/admin/packages", label: "Packages", icon: Package },
   { href: "/admin/payments", label: "Payments", icon: CreditCard },
+  { href: "/admin/referrals", label: "Referrals", icon: Gift },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 

@@ -1,6 +1,6 @@
 # Story 8.9: Referral Code Entry on Registration
 
-Status: drafted
+Status: review
 
 ## Story
 

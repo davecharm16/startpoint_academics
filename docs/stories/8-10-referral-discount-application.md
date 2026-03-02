@@ -1,6 +1,6 @@
 # Story 8.10: Referral Discount Application
 
-Status: drafted
+Status: review
 
 ## Story
 

@@ -8,6 +8,7 @@ import {
   projectCompletionEmail,
   deadlineWarningWriterEmail,
   deadlineWarningAdminEmail,
+  referralRewardEarnedEmail,
 } from "./templates";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -192,6 +193,25 @@ export async function notifyDeadlineWarningAdmin(data: {
 
   return sendEmail({
     to: data.adminEmail,
+    subject,
+    html,
+  });
+}
+
+// Referral reward earned notification to referrer
+export async function notifyReferralRewardEarned(data: {
+  referrerEmail: string;
+  referrerName: string;
+  rewardAmount: number;
+  totalBalance: number;
+}) {
+  const { subject, html } = referralRewardEarnedEmail({
+    ...data,
+    dashboardUrl: `${BASE_URL}/client/referrals`,
+  });
+
+  return sendEmail({
+    to: data.referrerEmail,
     subject,
     html,
   });

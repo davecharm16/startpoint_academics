@@ -1,6 +1,6 @@
 # Story 8.7: Referral Code Display & Sharing
 
-Status: drafted
+Status: review
 
 ## Story
 
