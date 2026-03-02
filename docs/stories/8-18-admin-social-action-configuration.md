@@ -1,6 +1,6 @@
 # Story 8.18: Admin Social Action Configuration
 
-Status: drafted
+Status: review
 
 ## Story
 

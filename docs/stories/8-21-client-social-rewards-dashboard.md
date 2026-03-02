@@ -1,6 +1,6 @@
 # Story 8.21: Client Social Rewards Dashboard
 
-Status: drafted
+Status: review
 
 ## Story
 

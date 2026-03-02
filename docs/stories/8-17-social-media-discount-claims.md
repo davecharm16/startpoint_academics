@@ -1,6 +1,6 @@
 # Story 8.17: Social Media Discount Claims
 
-Status: drafted
+Status: review
 
 ## Story
 
