@@ -1,6 +1,6 @@
 # Story 8.16: Client Profile Management
 
-Status: drafted
+Status: review
 
 ## Story
 
