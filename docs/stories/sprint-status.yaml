@@ -112,27 +112,31 @@ development_status:
   7-8-admin-daily-digest: done
   epic-7-retrospective: optional
 
-  # Epic 8: Client Accounts & Referral System (53 points, 21 stories) - NEW
+  # Epic 8: Client Accounts & Referral System (53 points, 21 stories)
+  # Group A: Client Foundation | Group B: Referral Engine | Group C: Social Marketing + Profile
   epic-8: contexted
   8-1-client-registration: review
-  8-2-client-login: backlog
-  8-3-client-password-reset: backlog
-  8-4-client-dashboard-layout: backlog
-  8-5-client-projects-dashboard: backlog
-  8-6-guest-tracking-compatibility: backlog
-  8-7-referral-code-generation: backlog
-  8-8-referral-dashboard-for-clients: backlog
-  8-9-referral-code-entry-on-registration: backlog
-  8-10-referral-discount-application: backlog
-  8-11-referrer-reward-tracking: backlog
-  8-12-reward-redemption-options: backlog
-  8-13-admin-referral-settings: backlog
-  8-14-admin-referral-analytics: backlog
-  8-15-admin-payout-processing: backlog
-  8-16-client-profile-management: backlog
-  8-17-social-media-discount-claims: backlog
-  8-18-admin-social-action-configuration: backlog
-  8-19-admin-social-verification-queue: backlog
-  8-20-social-discount-application: backlog
-  8-21-client-social-rewards-dashboard: backlog
+  # Group A: Client Foundation (stories 8-2 to 8-6)
+  8-2-client-login: drafted
+  8-3-client-password-reset: drafted
+  8-4-client-dashboard-layout: drafted
+  8-5-client-projects-dashboard: drafted
+  8-6-guest-tracking-compatibility: drafted
+  # Group B: Referral Engine (stories 8-7 to 8-15)
+  8-7-referral-code-display-sharing: drafted    # renamed: reduced scope, generation done in 8-1
+  8-8-referral-dashboard-clients: drafted
+  8-9-referral-code-entry-registration: drafted  # reduced scope: verification of 8-1 implementation
+  8-10-referral-discount-application: drafted     # HIGH RISK - TDD mandatory
+  8-11-referrer-reward-tracking: drafted          # HIGH RISK - TDD mandatory
+  8-12-reward-redemption-options: drafted          # HIGH RISK - TDD mandatory
+  8-13-admin-referral-settings: drafted
+  8-14-admin-referral-analytics: drafted
+  8-15-admin-payout-processing: drafted            # HIGH RISK - TDD mandatory
+  # Group C: Social Marketing + Profile (stories 8-16 to 8-21)
+  8-16-client-profile-management: drafted
+  8-17-social-media-discount-claims: drafted
+  8-18-admin-social-action-configuration: drafted
+  8-19-admin-social-verification-queue: drafted    # HIGH RISK - TDD mandatory
+  8-20-social-discount-application: drafted
+  8-21-client-social-rewards-dashboard: drafted
   epic-8-retrospective: optional
