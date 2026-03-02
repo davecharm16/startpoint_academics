@@ -11,6 +11,8 @@ import {
   referralRewardEarnedEmail,
   payoutApprovedEmail,
   payoutRejectedEmail,
+  socialClaimVerifiedEmail,
+  socialClaimRejectedEmail,
 } from "./templates";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -239,4 +241,43 @@ export async function notifyPayoutRejected(data: {
 }) {
   const { subject, html } = payoutRejectedEmail(data);
   return sendEmail({ to: data.clientEmail, subject, html });
+}
+
+// Social claim verified notification to client
+export async function notifySocialClaimVerified(data: {
+  clientEmail: string;
+  clientName: string;
+  actionType: string;
+  discountAmount: number;
+  totalBalance: number;
+}) {
+  const { subject, html } = socialClaimVerifiedEmail({
+    ...data,
+    dashboardUrl: `${BASE_URL}/client/social-rewards`,
+  });
+
+  return sendEmail({
+    to: data.clientEmail,
+    subject,
+    html,
+  });
+}
+
+// Social claim rejected notification to client
+export async function notifySocialClaimRejected(data: {
+  clientEmail: string;
+  clientName: string;
+  actionType: string;
+  rejectionReason: string;
+}) {
+  const { subject, html } = socialClaimRejectedEmail({
+    ...data,
+    dashboardUrl: `${BASE_URL}/client/social-rewards`,
+  });
+
+  return sendEmail({
+    to: data.clientEmail,
+    subject,
+    html,
+  });
 }

@@ -1,6 +1,6 @@
 # Story 8.20: Social Discount Application
 
-Status: drafted
+Status: review
 
 ## Story
 

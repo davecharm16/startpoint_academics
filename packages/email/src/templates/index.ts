@@ -17,4 +17,6 @@ export { passwordResetEmail } from "./password-reset";
 export { referralRewardEarnedEmail } from "./referral-reward-earned";
 export { payoutApprovedEmail } from "./payout-approved";
 export { payoutRejectedEmail } from "./payout-rejected";
+export { socialClaimVerifiedEmail } from "./social-claim-verified";
+export { socialClaimRejectedEmail } from "./social-claim-rejected";
 export { emailLayout } from "./layout";

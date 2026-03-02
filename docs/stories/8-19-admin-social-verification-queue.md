@@ -1,6 +1,6 @@
 # Story 8.19: Admin Social Verification Queue
 
-Status: drafted
+Status: review
 
 ## Story
 

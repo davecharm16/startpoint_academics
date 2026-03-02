@@ -13,6 +13,7 @@ import {
   Package,
   CreditCard,
   Gift,
+  Share2,
   Settings,
   LogOut,
   Menu,
@@ -27,6 +28,7 @@ const NAV_ITEMS = [
   { href: "/admin/packages", label: "Packages", icon: Package },
   { href: "/admin/payments", label: "Payments", icon: CreditCard },
   { href: "/admin/referrals", label: "Referrals", icon: Gift },
+  { href: "/admin/social-claims", label: "Social Claims", icon: Share2 },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
