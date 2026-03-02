@@ -1,6 +1,6 @@
 # Story 8.2: Client Login
 
-Status: drafted
+Status: review
 
 ## Story
 

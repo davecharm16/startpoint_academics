@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import dynamic from "next/dynamic";
 
 // Dynamically import the client component with SSR disabled
@@ -8,5 +9,9 @@ const ChangePasswordForm = dynamic(
 );
 
 export default function ChangePasswordPage() {
-  return <ChangePasswordForm />;
+  return (
+    <Suspense>
+      <ChangePasswordForm />
+    </Suspense>
+  );
 }

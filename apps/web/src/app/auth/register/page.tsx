@@ -87,9 +87,10 @@ function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const refCode = searchParams.get("ref");
+  const emailParam = searchParams.get("email");
 
   const [formData, setFormData] = useState<RegisterInput>({
-    email: "",
+    email: emailParam || "",
     password: "",
     fullName: "",
     phone: "",
@@ -108,6 +109,12 @@ function RegisterForm() {
       setFormData((prev) => ({ ...prev, referralCode: refCode }));
     }
   }, [refCode]);
+
+  useEffect(() => {
+    if (emailParam) {
+      setFormData((prev) => ({ ...prev, email: emailParam }));
+    }
+  }, [emailParam]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

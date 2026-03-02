@@ -1,6 +1,6 @@
 # Story 8.4: Client Dashboard Layout
 
-Status: drafted
+Status: review
 
 ## Story
 

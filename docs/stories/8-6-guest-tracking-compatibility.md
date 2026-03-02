@@ -1,6 +1,6 @@
 # Story 8.6: Guest Tracking Compatibility
 
-Status: drafted
+Status: review
 
 ## Story
 

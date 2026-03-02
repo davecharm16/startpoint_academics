@@ -1,11 +1,13 @@
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { createAdminClient } from "@startpoint/supabase/admin";
+import { createClient } from "@startpoint/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@startpoint/ui";
 import { Badge } from "@startpoint/ui";
 import { StatusStepper } from "@/components/tracking/status-stepper";
 import { PinVerification } from "@/components/tracking/pin-verification";
 import { TrackingDetails } from "@/components/tracking/tracking-details";
+import { CreateAccountBanner } from "@/components/tracking/create-account-banner";
 import { FileText, Calendar, Clock, Package } from "lucide-react";
 import { cookies } from "next/headers";
 
@@ -18,6 +20,7 @@ interface ProjectRow {
   reference_code: string;
   tracking_token: string;
   client_name: string;
+  client_email: string;
   client_phone: string | null;
   topic: string;
   requirements: string;
@@ -64,6 +67,7 @@ export default async function TrackingPage({ params }: TrackingPageProps) {
       reference_code,
       tracking_token,
       client_name,
+      client_email,
       client_phone,
       topic,
       requirements,
@@ -91,6 +95,29 @@ export default async function TrackingPage({ params }: TrackingPageProps) {
   // Check if PIN is verified via cookie
   const verificationCookie = cookieStore.get(`track_verified_${project.id}`);
   const isVerified = verificationCookie?.value === "true";
+
+  // Check if user is authenticated as a client (optional — don't error for anonymous)
+  let isAuthenticatedClient = false;
+  try {
+    const authClient = await createClient();
+    const {
+      data: { user },
+    } = await authClient.auth.getUser();
+
+    if (user) {
+      const { data: profile } = await authClient
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      if (profile && (profile as { role: string }).role === "client") {
+        isAuthenticatedClient = true;
+      }
+    }
+  } catch {
+    // Auth check is optional — anonymous users should not see errors
+  }
 
   // Fetch history if verified
   let timelineEvents: Array<{
@@ -238,6 +265,12 @@ export default async function TrackingPage({ params }: TrackingPageProps) {
             </CardContent>
           </Card>
         )}
+
+        {/* Create Account CTA for non-authenticated visitors */}
+        <CreateAccountBanner
+          clientEmail={project.client_email}
+          isAuthenticated={isAuthenticatedClient}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 # Story 8.3: Client Password Reset
 
-Status: drafted
+Status: review
 
 ## Story
 

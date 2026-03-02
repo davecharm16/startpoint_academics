@@ -1,6 +1,6 @@
 # Story 8.5: Client Projects Dashboard
 
-Status: drafted
+Status: review
 
 ## Story
 

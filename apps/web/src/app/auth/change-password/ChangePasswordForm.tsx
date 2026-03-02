@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@startpoint/supabase/client";
 import { Button } from "@startpoint/ui";
 import { Input } from "@startpoint/ui";
@@ -17,6 +17,8 @@ export default function ChangePasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isResetMode = searchParams.get("mode") === "reset";
   const supabase = createClient();
 
   // Password requirements
@@ -60,28 +62,36 @@ export default function ChangePasswordForm() {
       } = await supabase.auth.getUser();
 
       if (user) {
-        const { error: profileError } = await (supabase
-          .from("profiles") as ReturnType<typeof supabase.from>)
-          .update({ must_change_password: false } as never)
-          .eq("id", user.id);
+        // Only clear must_change_password flag if not in reset mode
+        if (!isResetMode) {
+          const { error: profileError } = await (supabase
+            .from("profiles") as ReturnType<typeof supabase.from>)
+            .update({ must_change_password: false } as never)
+            .eq("id", user.id);
 
-        if (profileError) {
-          console.error("Failed to update profile flag:", profileError);
-          // Don't throw - password was still changed successfully
+          if (profileError) {
+            console.error("Failed to update profile flag:", profileError);
+            // Don't throw - password was still changed successfully
+          }
         }
 
-        // Get role for redirect
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", user.id)
-          .single();
+        if (isResetMode) {
+          // Password reset flow: sign out and redirect to login with success message
+          await supabase.auth.signOut();
+          router.push("/auth/login?reset=true");
+        } else {
+          // Forced password change flow: redirect to appropriate dashboard
+          const { data: profileData } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .single();
 
-        const profile = profileData as { role: string } | null;
+          const profile = profileData as { role: string } | null;
 
-        // Redirect to appropriate dashboard
-        const redirectTo = profile?.role === "admin" ? "/admin" : "/writer";
-        router.push(redirectTo);
+          const redirectTo = profile?.role === "admin" ? "/admin" : profile?.role === "writer" ? "/writer" : "/client";
+          router.push(redirectTo);
+        }
         router.refresh();
       }
     } catch (err) {

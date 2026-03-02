@@ -1,9 +1,7 @@
 import { createClient } from "@startpoint/supabase/server";
-import { redirect } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@startpoint/ui";
-import { Button } from "@startpoint/ui";
-import { LogOut, User, Gift, Share2 } from "lucide-react";
-import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@startpoint/ui";
+import { CopyButton } from "@startpoint/ui";
+import { FolderOpen, Gift, Coins } from "lucide-react";
 
 export default async function ClientDashboard() {
   const supabase = await createClient();
@@ -13,120 +11,134 @@ export default async function ClientDashboard() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/auth/login");
+    return null;
   }
 
+  // Fetch profile for referral code and reward balance
   const { data: profile } = await supabase
     .from("profiles")
-    .select("*")
+    .select("full_name, referral_code, reward_balance")
     .eq("id", user.id)
     .single();
 
   const profileData = profile as {
     full_name: string;
-    referral_code?: string;
-    reward_balance?: number;
-    role: string;
+    referral_code: string | null;
+    reward_balance: number | null;
   } | null;
 
-  if (!profileData || profileData.role !== "client") {
-    redirect("/auth/login");
-  }
-
-  // Get project count for this client
+  // Fetch project count
   const { count: projectCount } = await supabase
     .from("projects")
     .select("*", { count: "exact", head: true })
     .or(`client_email.eq.${user.email},client_user_id.eq.${user.id}`);
 
+  // Fetch active referral count
+  const { count: referralCount } = await supabase
+    .from("referrals" as "profiles")
+    .select("*", { count: "exact", head: true })
+    .eq("referrer_id", user.id);
+
+  const rewardBalance = Number(profileData?.reward_balance || 0);
+  const referralCode = profileData?.referral_code || null;
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-PH", {
+      style: "currency",
+      currency: "PHP",
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
+
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="space-y-6">
       {/* Header */}
-      <header className="bg-background border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-semibold">Welcome, {profileData.full_name}!</h1>
-            <p className="text-sm text-muted-foreground">{user.email}</p>
-          </div>
-          <form action="/auth/signout" method="post">
-            <Button variant="outline" size="sm">
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
-          </form>
-        </div>
-      </header>
+      <div>
+        <h1 className="text-2xl font-bold">
+          Welcome back, {profileData?.full_name}!
+        </h1>
+        <p className="text-muted-foreground">
+          Here&apos;s an overview of your account.
+        </p>
+      </div>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Projects Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                My Projects
-              </CardTitle>
-              <CardDescription>View and track your projects</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{projectCount || 0}</p>
-              <p className="text-sm text-muted-foreground">Total projects</p>
-              <Link href="/client/projects" className="mt-4 inline-block">
-                <Button variant="outline" size="sm">View Projects</Button>
-              </Link>
-            </CardContent>
-          </Card>
+      {/* Summary Cards */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Projects
+            </CardTitle>
+            <FolderOpen className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{projectCount || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              Projects submitted
+            </p>
+          </CardContent>
+        </Card>
 
-          {/* Referral Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Gift className="h-5 w-5" />
-                Referral Program
-              </CardTitle>
-              <CardDescription>Earn rewards by referring friends</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-primary/5 p-3 rounded-lg mb-3">
-                <p className="text-xs text-muted-foreground">Your referral code:</p>
-                <p className="text-xl font-bold tracking-widest text-primary">
-                  {profileData.referral_code || "N/A"}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Reward Balance
+            </CardTitle>
+            <Coins className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {formatCurrency(rewardBalance)}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Available rewards
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Active Referrals
+            </CardTitle>
+            <Gift className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{referralCount || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              Friends referred
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Referral Code Section */}
+      {referralCode && (
+        <Card>
+          <CardContent className="py-6">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="flex-1 text-center sm:text-left">
+                <h3 className="text-lg font-semibold">
+                  Share your referral code
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Earn rewards when friends sign up and submit projects using
+                  your code!
                 </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Share this code with friends!
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Rewards Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Share2 className="h-5 w-5" />
-                My Rewards
-              </CardTitle>
-              <CardDescription>Track your earned rewards</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">
-                ₱{Number(profileData.reward_balance || 0).toFixed(2)}
-              </p>
-              <p className="text-sm text-muted-foreground">Available balance</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Coming Soon Notice */}
-        <div className="mt-8 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <h3 className="font-semibold text-yellow-800">More Features Coming Soon!</h3>
-          <p className="text-sm text-yellow-700 mt-1">
-            The full client dashboard with project details, referral tracking, and social rewards
-            is being developed. Stay tuned!
-          </p>
-        </div>
-      </main>
+              <div className="flex items-center gap-2 rounded-lg bg-primary/5 px-4 py-3">
+                <span className="font-mono text-2xl font-bold tracking-widest text-primary">
+                  {referralCode}
+                </span>
+                <CopyButton
+                  value={referralCode}
+                  label="Copy referral code"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
