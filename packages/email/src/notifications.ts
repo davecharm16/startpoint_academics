@@ -9,6 +9,8 @@ import {
   deadlineWarningWriterEmail,
   deadlineWarningAdminEmail,
   referralRewardEarnedEmail,
+  payoutApprovedEmail,
+  payoutRejectedEmail,
 } from "./templates";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -215,4 +217,26 @@ export async function notifyReferralRewardEarned(data: {
     subject,
     html,
   });
+}
+
+// Payout approved notification to client
+export async function notifyPayoutApproved(data: {
+  clientEmail: string;
+  clientName: string;
+  amount: number;
+  paymentMethod: string;
+}) {
+  const { subject, html } = payoutApprovedEmail(data);
+  return sendEmail({ to: data.clientEmail, subject, html });
+}
+
+// Payout rejected notification to client
+export async function notifyPayoutRejected(data: {
+  clientEmail: string;
+  clientName: string;
+  amount: number;
+  reason: string;
+}) {
+  const { subject, html } = payoutRejectedEmail(data);
+  return sendEmail({ to: data.clientEmail, subject, html });
 }

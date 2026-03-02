@@ -1,6 +1,6 @@
 # Story 8.15: Admin Payout Processing
 
-Status: drafted
+Status: review
 
 ## Story
 

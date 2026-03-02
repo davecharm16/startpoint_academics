@@ -495,6 +495,82 @@ export interface Database {
           created_at?: string;
         };
       };
+      social_reward_settings: {
+        Row: {
+          id: string;
+          action_type: "like_page" | "follow_page" | "share_post";
+          is_enabled: boolean;
+          discount_amount: number;
+          instruction_text: string;
+          social_url: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          action_type: "like_page" | "follow_page" | "share_post";
+          is_enabled?: boolean;
+          discount_amount?: number;
+          instruction_text?: string;
+          social_url?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          action_type?: "like_page" | "follow_page" | "share_post";
+          is_enabled?: boolean;
+          discount_amount?: number;
+          instruction_text?: string;
+          social_url?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      social_claims: {
+        Row: {
+          id: string;
+          user_id: string;
+          action_type: "like_page" | "follow_page" | "share_post";
+          social_username: string | null;
+          screenshot_path: string | null;
+          status: "pending" | "verified" | "rejected";
+          discount_amount: number | null;
+          rejection_reason: string | null;
+          verified_by: string | null;
+          verified_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          action_type: "like_page" | "follow_page" | "share_post";
+          social_username?: string | null;
+          screenshot_path?: string | null;
+          status?: "pending" | "verified" | "rejected";
+          discount_amount?: number | null;
+          rejection_reason?: string | null;
+          verified_by?: string | null;
+          verified_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          action_type?: "like_page" | "follow_page" | "share_post";
+          social_username?: string | null;
+          screenshot_path?: string | null;
+          status?: "pending" | "verified" | "rejected";
+          discount_amount?: number | null;
+          rejection_reason?: string | null;
+          verified_by?: string | null;
+          verified_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
       // Agent System Tables
       agent_usage_limits: {
         Row: {
@@ -829,6 +905,8 @@ export type Referral = Database["public"]["Tables"]["referrals"]["Row"];
 export type RewardTransaction = Database["public"]["Tables"]["reward_transactions"]["Row"];
 export type ReferralSettings = Database["public"]["Tables"]["referral_settings"]["Row"];
 export type PayoutRequest = Database["public"]["Tables"]["payout_requests"]["Row"];
+export type SocialRewardSettings = Database["public"]["Tables"]["social_reward_settings"]["Row"];
+export type SocialClaim = Database["public"]["Tables"]["social_claims"]["Row"];
 
 // Agent System Types
 export type AgentUsageLimit = Database["public"]["Tables"]["agent_usage_limits"]["Row"];

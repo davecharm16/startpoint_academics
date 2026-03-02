@@ -1,6 +1,6 @@
 # Story 8.12: Reward Redemption Options
 
-Status: drafted
+Status: review
 
 ## Story
 
