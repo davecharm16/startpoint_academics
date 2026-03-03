@@ -87,9 +87,10 @@ function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const refCode = searchParams.get("ref");
+  const emailParam = searchParams.get("email");
 
   const [formData, setFormData] = useState<RegisterInput>({
-    email: "",
+    email: emailParam || "",
     password: "",
     fullName: "",
     phone: "",
@@ -100,6 +101,9 @@ function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [fieldWarnings, setFieldWarnings] = useState<Record<string, string>>(
+    {}
+  );
   const [success, setSuccess] = useState(false);
   const [newReferralCode, setNewReferralCode] = useState<string | null>(null);
 
@@ -108,6 +112,12 @@ function RegisterForm() {
       setFormData((prev) => ({ ...prev, referralCode: refCode }));
     }
   }, [refCode]);
+
+  useEffect(() => {
+    if (emailParam) {
+      setFormData((prev) => ({ ...prev, email: emailParam }));
+    }
+  }, [emailParam]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -150,6 +160,9 @@ function RegisterForm() {
       // Success!
       setSuccess(true);
       setNewReferralCode(result.referralCode || null);
+      if (result.fieldWarnings) {
+        setFieldWarnings(result.fieldWarnings);
+      }
 
       // Redirect to client dashboard after short delay
       setTimeout(() => {
@@ -175,6 +188,14 @@ function RegisterForm() {
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center space-y-4">
+          {fieldWarnings.referralCode && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {fieldWarnings.referralCode}
+              </AlertDescription>
+            </Alert>
+          )}
           {newReferralCode && (
             <div className="bg-primary/5 p-4 rounded-lg">
               <p className="text-sm text-muted-foreground mb-2">
@@ -332,6 +353,11 @@ function RegisterForm() {
             />
             {fieldErrors.referralCode && (
               <p className="text-xs text-red-500">{fieldErrors.referralCode}</p>
+            )}
+            {fieldWarnings.referralCode && (
+              <p className="text-xs text-yellow-600">
+                {fieldWarnings.referralCode}
+              </p>
             )}
             <p className="text-xs text-muted-foreground">
               Have a referral code? Enter it to get a discount on your first order.

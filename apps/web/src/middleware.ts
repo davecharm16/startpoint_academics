@@ -94,6 +94,10 @@ export async function middleware(request: NextRequest) {
       if (profile.role === "writer") {
         return NextResponse.redirect(new URL("/writer", request.url));
       }
+      // If client trying to access admin, redirect to client dashboard
+      if (profile.role === "client") {
+        return NextResponse.redirect(new URL("/client", request.url));
+      }
       // Otherwise redirect to login
       return NextResponse.redirect(new URL("/auth/login", request.url));
     }
@@ -127,10 +131,16 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Change password page - require user to be logged in with must_change_password flag
+  // Change password page - require user to be logged in
   if (pathname === "/auth/change-password") {
     if (!user) {
       return NextResponse.redirect(new URL("/auth/login", request.url));
+    }
+
+    // Allow access if user is in password reset flow (mode=reset from email link)
+    const mode = request.nextUrl.searchParams.get("mode");
+    if (mode === "reset") {
+      return response;
     }
 
     const { data: profile } = await supabase
@@ -141,7 +151,7 @@ export async function middleware(request: NextRequest) {
 
     // If user doesn't need to change password, redirect to dashboard
     if (profile && !profile.must_change_password) {
-      const redirectTo = profile.role === "admin" ? "/admin" : "/writer";
+      const redirectTo = profile.role === "admin" ? "/admin" : profile.role === "writer" ? "/writer" : "/client";
       return NextResponse.redirect(new URL(redirectTo, request.url));
     }
   }
@@ -159,6 +169,9 @@ export async function middleware(request: NextRequest) {
     }
     if (profile?.role === "writer") {
       return NextResponse.redirect(new URL("/writer", request.url));
+    }
+    if (profile?.role === "client") {
+      return NextResponse.redirect(new URL("/client", request.url));
     }
   }
 

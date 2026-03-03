@@ -72,6 +72,7 @@ export interface Database {
           referred_by: string | null;
           referral_discount_used: boolean;
           reward_balance: number;
+          apply_rewards_to_next_order: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -90,6 +91,7 @@ export interface Database {
           referred_by?: string | null;
           referral_discount_used?: boolean;
           reward_balance?: number;
+          apply_rewards_to_next_order?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -108,6 +110,7 @@ export interface Database {
           referred_by?: string | null;
           referral_discount_used?: boolean;
           reward_balance?: number;
+          apply_rewards_to_next_order?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -244,6 +247,8 @@ export interface Database {
           cancellation_reason: string | null;
           cancelled_at: string | null;
           estimated_completion_at: string | null;
+          referral_discount_applied: number;
+          reward_balance_applied: number;
           created_at: string;
           updated_at: string;
         };
@@ -274,6 +279,8 @@ export interface Database {
           cancellation_reason?: string | null;
           cancelled_at?: string | null;
           estimated_completion_at?: string | null;
+          referral_discount_applied?: number;
+          reward_balance_applied?: number;
           created_at?: string;
           updated_at?: string;
         };
@@ -304,6 +311,8 @@ export interface Database {
           cancellation_reason?: string | null;
           cancelled_at?: string | null;
           estimated_completion_at?: string | null;
+          referral_discount_applied?: number;
+          reward_balance_applied?: number;
           created_at?: string;
           updated_at?: string;
         };
@@ -444,6 +453,120 @@ export interface Database {
           account_name?: string | null;
           additional_instructions?: string | null;
           display_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      payout_requests: {
+        Row: {
+          id: string;
+          user_id: string;
+          amount: number;
+          payment_method: "gcash" | "bank";
+          payment_details: Json;
+          status: "pending" | "paid" | "rejected";
+          rejection_reason: string | null;
+          processed_by: string | null;
+          processed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          amount: number;
+          payment_method: "gcash" | "bank";
+          payment_details?: Json;
+          status?: "pending" | "paid" | "rejected";
+          rejection_reason?: string | null;
+          processed_by?: string | null;
+          processed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          amount?: number;
+          payment_method?: "gcash" | "bank";
+          payment_details?: Json;
+          status?: "pending" | "paid" | "rejected";
+          rejection_reason?: string | null;
+          processed_by?: string | null;
+          processed_at?: string | null;
+          created_at?: string;
+        };
+      };
+      social_reward_settings: {
+        Row: {
+          id: string;
+          action_type: "like_page" | "follow_page" | "share_post";
+          is_enabled: boolean;
+          discount_amount: number;
+          instruction_text: string;
+          social_url: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          action_type: "like_page" | "follow_page" | "share_post";
+          is_enabled?: boolean;
+          discount_amount?: number;
+          instruction_text?: string;
+          social_url?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          action_type?: "like_page" | "follow_page" | "share_post";
+          is_enabled?: boolean;
+          discount_amount?: number;
+          instruction_text?: string;
+          social_url?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      social_claims: {
+        Row: {
+          id: string;
+          user_id: string;
+          action_type: "like_page" | "follow_page" | "share_post";
+          social_username: string | null;
+          screenshot_path: string | null;
+          status: "pending" | "verified" | "rejected";
+          discount_amount: number | null;
+          rejection_reason: string | null;
+          verified_by: string | null;
+          verified_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          action_type: "like_page" | "follow_page" | "share_post";
+          social_username?: string | null;
+          screenshot_path?: string | null;
+          status?: "pending" | "verified" | "rejected";
+          discount_amount?: number | null;
+          rejection_reason?: string | null;
+          verified_by?: string | null;
+          verified_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          action_type?: "like_page" | "follow_page" | "share_post";
+          social_username?: string | null;
+          screenshot_path?: string | null;
+          status?: "pending" | "verified" | "rejected";
+          discount_amount?: number | null;
+          rejection_reason?: string | null;
+          verified_by?: string | null;
+          verified_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -731,6 +854,17 @@ export interface Database {
           total_profit: number;
         };
       };
+      referral_leaderboard: {
+        Row: {
+          id: string;
+          full_name: string;
+          referral_code: string;
+          total_referrals: number;
+          conversions: number;
+          total_earned: number;
+          available_balance: number;
+        };
+      };
     };
     Functions: {
       is_admin: {
@@ -770,6 +904,9 @@ export type PaymentMethod = Database["public"]["Tables"]["payment_methods"]["Row
 export type Referral = Database["public"]["Tables"]["referrals"]["Row"];
 export type RewardTransaction = Database["public"]["Tables"]["reward_transactions"]["Row"];
 export type ReferralSettings = Database["public"]["Tables"]["referral_settings"]["Row"];
+export type PayoutRequest = Database["public"]["Tables"]["payout_requests"]["Row"];
+export type SocialRewardSettings = Database["public"]["Tables"]["social_reward_settings"]["Row"];
+export type SocialClaim = Database["public"]["Tables"]["social_claims"]["Row"];
 
 // Agent System Types
 export type AgentUsageLimit = Database["public"]["Tables"]["agent_usage_limits"]["Row"];

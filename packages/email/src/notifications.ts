@@ -8,6 +8,11 @@ import {
   projectCompletionEmail,
   deadlineWarningWriterEmail,
   deadlineWarningAdminEmail,
+  referralRewardEarnedEmail,
+  payoutApprovedEmail,
+  payoutRejectedEmail,
+  socialClaimVerifiedEmail,
+  socialClaimRejectedEmail,
 } from "./templates";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -192,6 +197,86 @@ export async function notifyDeadlineWarningAdmin(data: {
 
   return sendEmail({
     to: data.adminEmail,
+    subject,
+    html,
+  });
+}
+
+// Referral reward earned notification to referrer
+export async function notifyReferralRewardEarned(data: {
+  referrerEmail: string;
+  referrerName: string;
+  rewardAmount: number;
+  totalBalance: number;
+}) {
+  const { subject, html } = referralRewardEarnedEmail({
+    ...data,
+    dashboardUrl: `${BASE_URL}/client/referrals`,
+  });
+
+  return sendEmail({
+    to: data.referrerEmail,
+    subject,
+    html,
+  });
+}
+
+// Payout approved notification to client
+export async function notifyPayoutApproved(data: {
+  clientEmail: string;
+  clientName: string;
+  amount: number;
+  paymentMethod: string;
+}) {
+  const { subject, html } = payoutApprovedEmail(data);
+  return sendEmail({ to: data.clientEmail, subject, html });
+}
+
+// Payout rejected notification to client
+export async function notifyPayoutRejected(data: {
+  clientEmail: string;
+  clientName: string;
+  amount: number;
+  reason: string;
+}) {
+  const { subject, html } = payoutRejectedEmail(data);
+  return sendEmail({ to: data.clientEmail, subject, html });
+}
+
+// Social claim verified notification to client
+export async function notifySocialClaimVerified(data: {
+  clientEmail: string;
+  clientName: string;
+  actionType: string;
+  discountAmount: number;
+  totalBalance: number;
+}) {
+  const { subject, html } = socialClaimVerifiedEmail({
+    ...data,
+    dashboardUrl: `${BASE_URL}/client/social-rewards`,
+  });
+
+  return sendEmail({
+    to: data.clientEmail,
+    subject,
+    html,
+  });
+}
+
+// Social claim rejected notification to client
+export async function notifySocialClaimRejected(data: {
+  clientEmail: string;
+  clientName: string;
+  actionType: string;
+  rejectionReason: string;
+}) {
+  const { subject, html } = socialClaimRejectedEmail({
+    ...data,
+    dashboardUrl: `${BASE_URL}/client/social-rewards`,
+  });
+
+  return sendEmail({
+    to: data.clientEmail,
     subject,
     html,
   });

@@ -11,6 +11,9 @@ export {
   notifyProjectCompletion,
   notifyDeadlineWarningWriter,
   notifyDeadlineWarningAdmin,
+  notifyReferralRewardEarned,
+  notifyPayoutApproved,
+  notifyPayoutRejected,
 } from "./notifications";
 
 // Email templates

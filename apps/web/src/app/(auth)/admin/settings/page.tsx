@@ -2,7 +2,9 @@ import { createClient } from "@startpoint/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@startpoint/ui";
 import { PaymentSettingsForm } from "@/components/admin/payment-settings-form";
 import { PaymentMethodsManager } from "@/components/admin/payment-methods-manager";
-import { Settings, CreditCard } from "lucide-react";
+import { ReferralSettingsForm } from "@/components/admin/referral-settings-form";
+import { SocialSettingsForm } from "@/components/admin/social-settings-form";
+import { Settings, CreditCard, Gift, Share2 } from "lucide-react";
 
 interface PaymentSettingsRow {
   id: string;
@@ -25,6 +27,17 @@ interface PaymentMethodRow {
   display_order: number;
 }
 
+interface ReferralSettingsRow {
+  id: string;
+  program_enabled: boolean;
+  new_client_discount_type: "percentage" | "fixed";
+  new_client_discount_value: number;
+  referrer_reward_type: "percentage" | "fixed";
+  referrer_reward_value: number;
+  minimum_payout: number;
+  updated_at: string;
+}
+
 export default async function SettingsPage() {
   const supabase = await createClient();
 
@@ -44,13 +57,36 @@ export default async function SettingsPage() {
 
   const methods = (methodsData as PaymentMethodRow[] | null) || [];
 
+  // Fetch referral settings (single row)
+  const { data: referralData } = await supabase
+    .from("referral_settings" as "profiles")
+    .select("*")
+    .single();
+
+  const referralSettings = referralData as ReferralSettingsRow | null;
+
+  // Fetch social reward settings
+  const { data: socialData } = await (supabase
+    .from("social_reward_settings" as "profiles") as ReturnType<typeof supabase.from>)
+    .select("*")
+    .order("action_type");
+
+  const socialActions = (socialData || []) as Array<{
+    id: string;
+    action_type: "like_page" | "follow_page" | "share_post";
+    is_enabled: boolean;
+    discount_amount: number;
+    instruction_text: string;
+    social_url: string;
+  }>;
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold">Settings</h1>
         <p className="text-muted-foreground">
-          Configure payment requirements and methods
+          Configure payment requirements, methods, and referral settings
         </p>
       </div>
 
@@ -87,6 +123,38 @@ export default async function SettingsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Referral Program Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Gift className="h-5 w-5" />
+            Referral Program
+          </CardTitle>
+          <CardDescription>
+            Configure referral discounts, rewards, and payout thresholds
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ReferralSettingsForm settings={referralSettings} />
+        </CardContent>
+      </Card>
+
+      {/* Social Rewards Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Share2 className="h-5 w-5" />
+            Social Rewards
+          </CardTitle>
+          <CardDescription>
+            Configure social media engagement rewards and actions
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SocialSettingsForm actions={socialActions} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

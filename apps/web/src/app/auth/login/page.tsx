@@ -16,6 +16,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirectTo");
   const justRegistered = searchParams.get("registered") === "true";
+  const justReset = searchParams.get("reset") === "true";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -110,6 +111,15 @@ function LoginForm() {
             </Alert>
           )}
 
+          {justReset && (
+            <Alert className="border-green-200 bg-green-50">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <AlertDescription className="text-green-800">
+                Your password has been updated successfully. Please sign in with your new password.
+              </AlertDescription>
+            </Alert>
+          )}
+
           {error && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
@@ -141,6 +151,11 @@ function LoginForm() {
               required
               disabled={isLoading}
             />
+            <div className="text-right">
+              <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline">
+                Forgot Password?
+              </Link>
+            </div>
           </div>
 
           <Button
